@@ -6,8 +6,7 @@ import random
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, GObject, GLib, Gdk, cairo
 import cairo
-
-
+from math import *
 
 class RouteVisualizerModel(Gtk.DrawingArea):
     def __init__(self):
@@ -69,6 +68,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
         self.button1_down = False
         self.last_selected_node = None
         self.hover_over_node = False
+        self.selected_nodes_count = 0
 
         self.set_size_request(900,500)
 
@@ -100,26 +100,35 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
         mouse_in_node = self.point_in_node(self.mouse_down_x, self.mouse_down_y)
 
-        if event.state & Gdk.ModifierType.SHIFT_MASK:
-            shift_in = True
-        else:
-            shift_in = False
+        # if event.state & Gdk.ModifierType.SHIFT_MASK:
+        #     shift_in = True
+        # else:
+        #     shift_in = False
+        #
+        # if event.state & Gdk.ModifierType.CONTROL_MASK:
+        #     control_in = True
+        # else:
+        #     control_in = False
 
-        if event.state & Gdk.ModifierType.CONTROL_MASK:
-            control_in = True
-        else:
-            control_in = False
-
-        if not control_in and not shift_in:
-            self.clear_node_selections()
-
+        self.clear_node_selections()
 
         if mouse_in_node != False:
             self._model.nodes[mouse_in_node]['selected'] = True
+            self.selected_nodes_count = self.selected_nodes_count + 1
             self.last_selected_node = mouse_in_node
 
         self.queue_draw()
         pass
+
+
+    def mouse_button_release(self, widget, event):
+        self.button1_down = False
+        self.mouse_dragging_selection = False
+
+        hovering = self.point_in_node(event.x, event.y)
+        if hovering != self.hover_over_node:
+            self.hover_over_node = hovering
+            self.queue_draw()
 
     def clear_node_selections(self, except_node=None):
         for node, node_keys in self._model.nodes.items():
@@ -129,14 +138,6 @@ class RouteVisualizerView(Gtk.DrawingArea):
             if 'selected' in node_keys:
                 if node_keys['selected'] == True:
                     node_keys['selected'] = False
-
-
-    def mouse_button_release(self, widget, event):
-        self.button1_down = False
-        self.mouse_dragging_selection = False
-
-
-
 
     def mouse_leave(self, widget, event):
         self._mouse_in_cell = -1
@@ -163,10 +164,6 @@ class RouteVisualizerView(Gtk.DrawingArea):
             if hovering != self.hover_over_node:
                 self.hover_over_node = hovering
                 self.queue_draw()
-
-
-
-
 
 
     def move_selected_nodes(self, mx, my):
@@ -260,24 +257,183 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
         #############
         # Now draw the links
-        for node_a, node_b_dict in self._model.links.items():
-            for node_b in node_b_dict.keys():
+        for node_a_name, node_b_dict in self._model.links.items():
+            for node_b_name in node_b_dict.keys():
+                # Some constants
+                LINE_START_WIDTH = 30
+                LINK_CURVE = 10
 
                 cr.set_source(default_source_pattern)
                 cr.set_source_rgb(0.0, 0.8, 0.0)
                 cr.set_line_width(4.0)
                 cr.set_line_cap(cairo.LINE_CAP_ROUND)
 
-                l1, l2 = self.get_closest_link_path(node_a, node_b)
+                node_a = self._model.nodes[node_a_name]
+                node_b = self._model.nodes[node_b_name]
+
+                half_width = self.NODE_WIDTH / 2
+                half_height = self.NODE_HEIGHT / 2
+
+                node_a_x = node_a['posx'] + self.NODE_WIDTH / 2
+                node_a_y = node_a['posy'] + self.NODE_HEIGHT / 2
+
+                node_b_x = node_b['posx'] + self.NODE_WIDTH / 2
+                node_b_y = node_b['posy'] + self.NODE_HEIGHT / 2
+
+                x_distance_between_nodes = abs(node_a_x - node_b_x) - half_width
+                y_distance_between_nodes = abs(node_a_y - node_b_y)
+
+                ax = 0  # X accumulator
+                ay = 0  # Y Accumulator
 
 
-                cr.move_to(l1[0], l1[1])
-                cr.line_to(l2[0], l2[1])
+                if y_distance_between_nodes < half_height * 0.5:
+                    y_aligned = True
+                else:
+                    y_aligned = False
+
+
+                # Draw a little nub out the side of node_a
+                if node_b_x > node_a_x + half_width:
+                    node_b_right = True
+                else:
+                    node_b_right = False
+
+                if node_b_y > node_a_y:
+                    node_b_below = True
+                else:
+                    node_b_below = False
+
+                if node_b_right:
+                    dx = 1
+                else:
+                    dx = -1
+
+
+                if node_b_below:
+                    dy = 1
+                else:
+                    dy = -1
+
+                if node_b_right:
+                    cr.move_to(node_a_x + half_width, node_a_y)
+                    ax = node_a_x + half_width
+                    ay = node_a_y
+                else:
+                    cr.move_to(node_a_x - half_width, node_a_y)
+                    ax = node_a_x - half_width
+                    ay = node_a_y
+
+                # If the nodes are fairly aligned on he Y axis, then just draw the line right across
+                if y_aligned:
+                    if node_b_right:
+                        cr.line_to(node_b_x - half_width, node_a_y)
+                    else:
+                        cr.line_to(node_b_x + half_width, node_a_y)
+
+                if not y_aligned and x_distance_between_nodes - self.NODE_WIDTH > LINK_CURVE * 2:
+                    ax = ax + (x_distance_between_nodes - (half_width * dx)) / 2
+                    cr.line_to(ax, ay)
+                    cr.curve_to(ax, ay,
+                                ax + (LINK_CURVE * dx), ay,
+                                ax + (LINK_CURVE * dx), ay + (LINK_CURVE * dy))
+
+                    ax = ax + (LINK_CURVE * dx)
+                    ay = node_b_y - (LINK_CURVE * dy)
+
+                    cr.line_to(ax, ay)
+
+                    cr.curve_to(ax, ay,
+                                ax, ay + (LINK_CURVE * dy),
+                                ax + (LINK_CURVE * dx), ay + (LINK_CURVE * dy))
+
+                    ax = ax + (LINK_CURVE * dx)
+                    ay = ay + (LINK_CURVE * dy)
+
+                    cr.line_to(node_b_x - (half_width * dx), node_b_y)
+
+                if not y_aligned and x_distance_between_nodes - self.NODE_WIDTH <= LINK_CURVE * 2:
+                    cr.line_to(node_b_x - (LINK_CURVE * dx), ay)
+                    ax = node_b_x - (LINK_CURVE *dx)
+
+                    cr.curve_to(ax, ay,
+                                ax + (LINK_CURVE * dx), ay,
+                                ax + (LINK_CURVE * dx), ay + (LINK_CURVE * dy))
+                    ax = ax + (LINK_CURVE * dx)
+                    ay = ay + (LINK_CURVE * dy)
+                    cr.line_to(ax, node_b_y - (half_height * dy))
+
+
                 cr.stroke()
+
+            # first draw a line coming out the side whichever node b is on
+
+                # node_a_con_point = self.get_closest_connection_point_to(node_a, node_b)
+                # node_b_con_point = self.get_closest_connection_point_to(node_b, node_a)
+                #
+                # cr.move_to(node_a_con_point[0], node_a_con_point[1])
+                # cr.line_to(node_b_con_point[0], node_b_con_point[1])
+                # cr.stroke()
                 # print("connection %s, %s" % (l1, l2))
 
+    def draw_link_horizontal(self):
+        pass
+
+    def draw_link_vertical(self):
+        pass
+
+    def draw_link_offset(self):
+        pass
+
+
+    def get_closest_connection_point_to(self, this_node_name, other_node_name):
+        this_node = self._model.nodes[this_node_name]
+        other_node = self._model.nodes[other_node_name]
+
+        half_width = self.NODE_WIDTH / 2
+        half_height = self.NODE_HEIGHT / 2
+
+        this_node_x = this_node['posx'] + self.NODE_WIDTH / 2
+        this_node_y = this_node['posy'] + self.NODE_HEIGHT / 2
+
+        other_node_x = other_node['posx'] + self.NODE_WIDTH / 2
+        other_node_y = other_node['posy'] + self.NODE_HEIGHT / 2
+
+        # option[]
+
+        # if this_node_x - half_height > other_node_x:
+        #     option['top'] = this_node_x - half_height
+
+        # a = self.calc_distance(this_node_x + half_width, this_node_y, other_node_x, other_node_y) # Right
+        # b = self.calc_distance(this_node_x, this_node_y + half_height, other_node_x, other_node_y) # Bottom
+        # c = self.calc_distance(this_node_x - half_width, this_node_y, other_node_x, other_node_y) # Left
+        # d = self.calc_distance(this_node_x, this_node_y - half_height, other_node_x, other_node_y) # Top
+        #
+        # if a <= b and a <= c and a <= d:
+        #     return (this_node_x - half_width, this_node_y)
+        # if b <= a and b <= c and b <= d:
+        #     return (this_node_x, this_node_y + half_height)
+        # if c <= a and c <= b and c <= d:
+        #     return (this_node_x + half_width, this_node_y)
+        # if d <= a and d <= b and d <= c:
+        #     return (this_node_x, this_node_y - half_height)
+
+
+    def calc_distance(self, x, y, xx, yy):
+        if x > xx:
+            x, xx = xx, x
+        if y > y:
+            y, yy = yy, y
+
+        x = xx - x
+        y = yy - y
+
+        angle = atan(y/x)
+        return angle * y
 
     def get_closest_link_path(self, node_a, node_b, route_layer='default'):
+        nodes = self._model.nodes
+
         NODE_A = 1 # Just some constants
         NODE_B = 2
         TOP = 1
@@ -285,9 +441,24 @@ class RouteVisualizerView(Gtk.DrawingArea):
         BOTTOM = 3
         LEFT = 4
 
+        node_a_left = nodes[node_a]['posx']
+        node_a_right = nodes[node_a]['posx'] + self.NODE_WIDTH
+        node_a_top = nodes[node_a]['posy']
+        node_a_bottom = nodes[node_a]['posy'] + self.NODE_HEIGHT
 
-        node_a_line_point = self.get_node_right_side(node_a)
-        node_b_line_point = self.get_node_left_side(node_b)
+        node_b_left = nodes[node_b]['posx']
+        node_b_right = nodes[node_b]['posx'] + self.NODE_WIDTH
+        node_b_top = nodes[node_b]['posy']
+        node_b_bottom = nodes[node_b]['posy'] + self.NODE_HEIGHT
+
+
+        if node_a_right < node_b_left:
+            node_a_line_point = self.get_node_right_side(node_a)
+            node_b_line_point = self.get_node_left_side(node_b)
+        else:
+            node_a_line_point = self.get_node_left_side(node_a)
+            node_b_line_point = self.get_node_right_side(node_b)
+
 
         return (node_a_line_point, node_b_line_point)
 
@@ -330,37 +501,6 @@ class RouteVisualizerView(Gtk.DrawingArea):
     def set_model(self, model):
         self._model = model
         self.queue_draw()
-
-        # for index, hop in enumerate(self.hop_list):
-        #     this_hop_top_left = index * (self.HOP_SPACING + self.HOP_WIDTH)
-        #     self.set_default_font_colour(cr)
-        #
-        #     # TODO: There are more advanced font rendering techniques for centring etc. THis will work for now
-        #     self.set_smaller_than_default_font_size(cr)
-        #     cr.move_to(this_hop_top_left, 15)
-        #     cr.show_text("Hop #" + str(index))
-        #
-        #
-        #     # TODO: Gtk has a lot of cruft about getting the correct color to render text in.
-        #     # Will have to do a whole thing to stylize this widget the same as other widgets
-        #     # for their theme.
-        #     self.set_default_font_size(cr)
-        #     cr.move_to(this_hop_top_left, 35)
-        #
-        #     if index == 0:
-        #         cr.show_text("Client")
-        #     else:
-        #         cr.show_text(hop['ip'])
-        #
-        #     cr.set_source_surface(self.icon_router, 20, 20)
-        #     cr.paint()
-        #
-        #     cr.set_source(default_source_pattern)
-        #
-        #     self.set_default_font_size(cr)
-        #     cr.move_to(this_hop_top_left, 75)
-        #     cr.show_text("SDFSDFSFD")
-
 
 
 
