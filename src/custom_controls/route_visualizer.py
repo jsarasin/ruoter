@@ -325,6 +325,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
                         # that means if there's a transition in progress, we can change its target to match the new
                         # path.
                         if old_path_type == link.path_type:
+                            link.get_path()
                             link.target_path = self.granulate_path(link.get_path(), len(link.target_path))
 
 
@@ -496,7 +497,6 @@ class RouteVisualizerView(Gtk.DrawingArea):
         cr.stroke()
 
     def transition_animate(self):
-        print(".")
         delete_animations = []
 
         # As this function is likely to be called from a separate thread, we need to disable its execution
@@ -572,7 +572,6 @@ class RouteVisualizerView(Gtk.DrawingArea):
             for x in range(target_node_count - len(source_path)):
                 source_path.append((source_path[source_path_length-1][0], source_path[source_path_length-1][1]))
 
-            print("source:", source_path)
             return source_path
 
     def calc_distance(self, xy, xxyy):

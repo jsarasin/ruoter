@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d21c28ba-aaac-44bf-a7cd-25687c9e143e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/custom_controls/route_visualizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/custom_controls/route_visualizer.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -58,14 +57,14 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="430">
-              <caret line="327" column="105" selection-start-line="327" selection-start-column="105" selection-end-line="327" selection-end-column="105" />
+            <state relative-caret-position="234">
+              <caret line="327" column="104" selection-start-line="327" selection-start-column="93" selection-end-line="327" selection-end-column="104" />
               <folding>
-                <marker date="1534215688919" expanded="true" signature="397:399" ph="..." />
-                <marker date="1534215688919" expanded="true" signature="429:6148" ph="..." />
-                <marker date="1534215688919" expanded="true" signature="1842:1851" ph="..." />
-                <marker date="1534215688919" expanded="true" signature="19082:20782" ph="..." />
-                <marker date="1534215688919" expanded="true" signature="21725:22311" ph="..." />
+                <marker date="1534215817814" expanded="true" signature="397:399" ph="..." />
+                <marker date="1534215817814" expanded="true" signature="429:6148" ph="..." />
+                <marker date="1534215817814" expanded="true" signature="1842:1851" ph="..." />
+                <marker date="1534215817814" expanded="true" signature="19064:20763" ph="..." />
+                <marker date="1534215817814" expanded="true" signature="21706:22250" ph="..." />
               </folding>
             </state>
           </provider>
@@ -111,6 +110,8 @@
       <find>Movement 2    :</find>
       <find>----</find>
       <find>['links']</find>
+      <find>&quot;.&quot;</find>
+      <find>source:</find>
     </findStrings>
     <replaceStrings>
       <replace>NODE_HEIGHT</replace>
@@ -294,14 +295,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="430">
-          <caret line="327" column="105" selection-start-line="327" selection-start-column="105" selection-end-line="327" selection-end-column="105" />
+        <state relative-caret-position="234">
+          <caret line="327" column="104" selection-start-line="327" selection-start-column="93" selection-end-line="327" selection-end-column="104" />
           <folding>
-            <marker date="1534215688919" expanded="true" signature="397:399" ph="..." />
-            <marker date="1534215688919" expanded="true" signature="429:6148" ph="..." />
-            <marker date="1534215688919" expanded="true" signature="1842:1851" ph="..." />
-            <marker date="1534215688919" expanded="true" signature="19082:20782" ph="..." />
-            <marker date="1534215688919" expanded="true" signature="21725:22311" ph="..." />
+            <marker date="1534215817814" expanded="true" signature="397:399" ph="..." />
+            <marker date="1534215817814" expanded="true" signature="429:6148" ph="..." />
+            <marker date="1534215817814" expanded="true" signature="1842:1851" ph="..." />
+            <marker date="1534215817814" expanded="true" signature="19064:20763" ph="..." />
+            <marker date="1534215817814" expanded="true" signature="21706:22250" ph="..." />
           </folding>
         </state>
       </provider>
