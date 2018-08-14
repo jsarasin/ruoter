@@ -16,7 +16,7 @@ LINE_START_WIDTH = 30
 LINK_CURVE = 10
 HALF_WIDTH = NODE_WIDTH * 0.5
 HALF_HEIGHT = NODE_HEIGHT * 0.5
-TRANSITION_ANIMATION_TIME = 0.1
+TRANSITION_ANIMATION_TIME = 0.15
 
 
 class RouteVisualizerLinkPath:
@@ -49,6 +49,9 @@ class RouteVisualizerLinkPath:
         return self.path
 
     def gen_path(self):
+        # EDGE_ACCOMODATE_CURVE_PERCENT = 0.9
+        EDGE_ACCOMODATE_CURVE_PERCENT = 1.0
+
         if self.node_b['posx'] > self.node_a['posx']:
             b_right_of = True
         else:
@@ -73,33 +76,33 @@ class RouteVisualizerLinkPath:
         vertical_offset = abs(self.node_a['posy'] - self.node_b['posy'])
         # TODO: Handle overlapping nodes nicely
 
-        # If the nodes are horizontally aligned up to 90%: Straight line from center of node A
-        if vertical_offset < HALF_HEIGHT * 0.9:
-            self.prepare_new_type(1)
+        # If the nodes are horizontally aligned up to EDGE_ACCOMODATE_CURVE_PERCENT%: Straight line from center of node A
+        if vertical_offset < HALF_HEIGHT * EDGE_ACCOMODATE_CURVE_PERCENT:
+            self.change_new_type(1)
 
             self.add_straight(self.node_a['posx'] + (HALF_WIDTH * dx), self.node_a['posy'])
             self.add_straight(self.node_b['posx'] - (HALF_WIDTH * dx), self.node_a['posy'])
             return
 
-        # if the nodes are horizontally aligned over 90%: Offset line offset from center of node A
-        if vertical_offset >= HALF_HEIGHT * 0.9 and vertical_offset < HALF_HEIGHT:
-            self.prepare_new_type(2)
-            vertical_offset_correct = (HALF_HEIGHT * 0.9 - vertical_offset) * dy * -1
+        # if the nodes are horizontally aligned over EDGE_ACCOMODATE_CURVE_PERCENT%: Offset line offset from center of node A
+        if vertical_offset >= HALF_HEIGHT * EDGE_ACCOMODATE_CURVE_PERCENT and vertical_offset < HALF_HEIGHT and EDGE_ACCOMODATE_CURVE_PERCENT < 1.0:
+            self.change_new_type(2)
+            vertical_offset_correct = (HALF_HEIGHT * EDGE_ACCOMODATE_CURVE_PERCENT - vertical_offset) * dy * -1
             self.add_straight(self.node_a['posx'] + (HALF_WIDTH * dx), self.node_a['posy'] + (vertical_offset_correct))
             self.add_straight(self.node_b['posx'] - (HALF_WIDTH * dx), self.node_a['posy'] + (vertical_offset_correct))
             return
 
-        # If the nodes are vertically aligned up to 90%: Straight line from center of node A
-        if horizontal_offset < HALF_WIDTH * 0.9:
-            self.prepare_new_type(3)
+        # If the nodes are vertically aligned up to EDGE_ACCOMODATE_CURVE_PERCENT%: Straight line from center of node A
+        if horizontal_offset < HALF_WIDTH * EDGE_ACCOMODATE_CURVE_PERCENT:
+            self.change_new_type(3)
             self.add_straight(self.node_a['posx'], self.node_a['posy'] + (HALF_HEIGHT * dy))
             self.add_straight(self.node_a['posx'], self.node_b['posy']- (HALF_HEIGHT * dy))
             return
 
-        # if the nodes are vertically aligned over 90%: Offset line offset from center of node A
-        if horizontal_offset >= HALF_WIDTH * 0.9 and horizontal_offset < HALF_WIDTH:
-            self.prepare_new_type(4)
-            horizontal_offset_correct = (HALF_WIDTH * 0.9 - horizontal_offset) * dx * -1
+        # if the nodes are vertically aligned over EDGE_ACCOMODATE_CURVE_PERCENT%: Offset line offset from center of node A
+        if horizontal_offset >= HALF_WIDTH * EDGE_ACCOMODATE_CURVE_PERCENT and horizontal_offset < HALF_WIDTH and EDGE_ACCOMODATE_CURVE_PERCENT < 1.0:
+            self.change_new_type(4)
+            horizontal_offset_correct = (HALF_WIDTH * EDGE_ACCOMODATE_CURVE_PERCENT - horizontal_offset) * dx * -1
             self.add_straight(self.node_a['posx'] + (horizontal_offset_correct), self.node_a['posy'] + (HALF_HEIGHT * dy))
             self.add_straight(self.node_a['posx'] + (horizontal_offset_correct), self.node_b['posy']- (HALF_HEIGHT * dy))
             return
@@ -107,7 +110,7 @@ class RouteVisualizerLinkPath:
         # If the nodes are neither horz or vert aligned yet far enough apart on the horz plane to accommodate curves...
         # If the horizontal offset is greater than two curve sizes
         if horizontal_offset - NODE_WIDTH > LINK_CURVE * 2 and vertical_offset > HALF_HEIGHT:
-            self.prepare_new_type(5)
+            self.change_new_type(5)
             middle_point = self.node_a['posx'] + (((horizontal_offset) / 2) * dx)
 
             self.add_straight(self.node_a['posx'] + (HALF_WIDTH * dx), self.node_a['posy'])
@@ -122,7 +125,7 @@ class RouteVisualizerLinkPath:
 
         # If the horizontal offset is smaller than two curve sizes
         if horizontal_offset - NODE_WIDTH <= LINK_CURVE * 2 and vertical_offset > HALF_HEIGHT:
-            self.prepare_new_type(6)
+            self.change_new_type(6)
             self.add_straight(self.node_a['posx'] + (HALF_WIDTH * dx), self.node_a['posy'])
             self.add_straight(self.node_b['posx'] + (LINK_CURVE * dx * -1), self.node_a['posy'])
             self.add_curved(self.node_b['posx'], self.node_a['posy'],
@@ -130,13 +133,16 @@ class RouteVisualizerLinkPath:
             self.add_straight(self.node_b['posx'], self.node_b['posy'] + (HALF_HEIGHT * dy * -1))
             self.path_type = 6
 
-    def prepare_new_type(self, type):
+    def change_new_type(self, type):
         if self.path_type != type:
             self.old_path = self.path.copy()
             self.old_path_type = self.path_type
             self.path_type = type
+            self.clear()
+            return True
 
         self.clear()
+        return False
 
 
 
@@ -312,7 +318,15 @@ class RouteVisualizerView(Gtk.DrawingArea):
                     node_keys['posy'] = node_keys['posy'] + my
 
                     for link in self._model.nodes[node]['links']:
+                        old_path_type = link.path_type
                         link.gen_path()
+
+                        # If the path type is the same, then the line locations have only been updated,
+                        # that means if there's a transition in progress, we can change its target to match the new
+                        # path.
+                        if old_path_type == link.path_type:
+                            link.target_path = self.granulate_path(link.get_path(), len(link.target_path))
+
 
 
 
@@ -546,6 +560,20 @@ class RouteVisualizerView(Gtk.DrawingArea):
             translate_old_path = old_path.copy()
 
         return (translate_new_path, translate_old_path)
+
+    def granulate_path(self, source_path, target_node_count):
+        source_path_length = len(source_path)
+        if len(source_path) == target_node_count:
+            return source_path
+        if len(source_path) > target_node_count:
+            result = source_path[:target_node_count]
+            print("Granulate shrink result: %s, target %s" %(len(result), target_node_count) )
+        if len(source_path) < target_node_count:
+            for x in range(target_node_count - len(source_path)):
+                source_path.append((source_path[source_path_length-1][0], source_path[source_path_length-1][1]))
+
+            print("source:", source_path)
+            return source_path
 
     def calc_distance(self, xy, xxyy):
         x = xy[0]
