@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d21c28ba-aaac-44bf-a7cd-25687c9e143e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/custom_controls/route_visualizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/custom_controls/route_visualizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/main.glade" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/main.glade" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/main_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/main_window.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,33 +16,37 @@
     <session id="-2130579272">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="6" />
+          <entry key="project.closed" value="8" />
           <entry key="project.open.time.0" value="3" />
           <entry key="project.open.time.1" value="1" />
           <entry key="project.open.time.2" value="1" />
           <entry key="project.open.time.5" value="1" />
-          <entry key="project.open.time.6" value="1" />
-          <entry key="project.opened" value="7" />
+          <entry key="project.open.time.6" value="2" />
+          <entry key="project.open.time.7" value="1" />
+          <entry key="project.open.time.8" value="1" />
+          <entry key="project.opened" value="10" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="4" />
+          <entry key="py" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="4" />
+          <entry key="Python" value="5" />
+          <entry key="Scratch" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="4446" />
+          <entry key="py" value="15481" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="4446" />
+          <entry key="Python" value="15480" />
+          <entry key="Scratch" value="1" />
         </counts>
       </usages-collector>
     </session>
@@ -56,12 +59,24 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="270" selection-start-line="270" selection-end-line="270" />
+            <state relative-caret-position="557">
+              <caret line="105" lean-forward="true" selection-start-line="99" selection-end-line="105" />
               <folding>
-                <marker date="1534004690489" expanded="true" signature="13923:13930" ph="..." />
-                <marker date="1534004690489" expanded="true" signature="15494:15680" ph="..." />
+                <marker date="1534214060219" expanded="true" signature="396:398" ph="..." />
+                <marker date="1534214060219" expanded="true" signature="428:5649" ph="..." />
+                <marker date="1534214060219" expanded="true" signature="1750:1759" ph="..." />
+                <marker date="1534214060219" expanded="true" signature="18107:19807" ph="..." />
+                <marker date="1534214060219" expanded="true" signature="20643:20647" ph="..." />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1296">
+              <caret line="72" lean-forward="true" selection-start-line="72" selection-end-line="75" />
             </state>
           </provider>
         </entry>
@@ -69,12 +84,12 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/gui/main_window.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="594">
-              <caret line="34" selection-start-line="34" selection-end-line="34" />
+            <state relative-caret-position="630">
+              <caret line="36" lean-forward="true" selection-start-line="36" selection-end-line="36" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
-                <marker date="1534051545344" expanded="true" signature="579:1028" ph="..." />
-                <marker date="1534051545344" expanded="true" signature="2984:3564" ph="..." />
+                <marker date="1534127794415" expanded="true" signature="581:1030" ph="..." />
+                <marker date="1534127794415" expanded="true" signature="2986:3566" ph="..." />
               </folding>
             </state>
           </provider>
@@ -82,22 +97,42 @@
       </file>
     </leaf>
   </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>self.NODE_WIDTH</find>
+      <find>self.NODE_HEIGHT</find>
+      <find>self.DRAG_THRESHOLD</find>
+      <find>self.old_path</find>
+      <find>.old_path</find>
+      <find>tra</find>
+      <find>.old_path =</find>
+      <find>old_path</find>
+      <find>len new</find>
+      <find>Movement 2</find>
+      <find>Movement 2    :</find>
+      <find>----</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>NODE_HEIGHT</replace>
+      <replace>DRAG_THRESHOLD</replace>
+    </replaceStrings>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.py" />
         <option value="$PROJECT_DIR$/src/gui/main_window.py" />
         <option value="$PROJECT_DIR$/src/custom_controls/route_visualizer.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="726" />
-    <option name="y" value="31" />
-    <option name="width" value="1194" />
-    <option name="height" value="1048" />
+    <option name="y" value="30" />
+    <option name="width" value="1920" />
+    <option name="height" value="524" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -129,6 +164,15 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="gui" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="ruoter" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Scratches and Consoles" type="1a2a3e82:ScratchProjectViewPane$MyProjectNode" />
+            </path>
+            <path>
+              <item name="ruoter" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Scratches and Consoles" type="1a2a3e82:ScratchProjectViewPane$MyProjectNode" />
+              <item name="Scratches" type="d62648e6:ScratchProjectViewPane$MyRootNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -136,7 +180,9 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main.py" />
+    <property name="settings.editor.selected.configurable" value="Errors" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -190,19 +236,19 @@
     <frame x="0" y="30" width="1920" height="1049" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49949342" visible="true" weight="0.1265625" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49949342" visible="true" weight="0.13177083" />
       <window_info id="Structure" order="1" sideWeight="0.50052136" side_tool="true" weight="0.12843552" />
       <window_info id="Favorites" order="2" sideWeight="0.5005066" side_tool="true" weight="0.1265625" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.16312057" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32928064" />
+      <window_info active="true" anchor="bottom" x="0" y="458" width="1920" height="204" id="Run" order="2" sideWeight="0.49947917" visible="true" weight="0.23100305" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39918947" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5005208" side_tool="true" weight="0.17325228" />
       <window_info anchor="bottom" id="Python Console" order="10" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -220,25 +266,42 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="270" selection-start-line="270" selection-end-line="270" />
-          <folding>
-            <marker date="1534004690489" expanded="true" signature="13923:13930" ph="..." />
-            <marker date="1534004690489" expanded="true" signature="15494:15680" ph="..." />
-          </folding>
+        <state relative-caret-position="1296">
+          <caret line="72" lean-forward="true" selection-start-line="72" selection-end-line="75" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/gui/main_window.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="594">
-          <caret line="34" selection-start-line="34" selection-end-line="34" />
+        <state relative-caret-position="630">
+          <caret line="36" lean-forward="true" selection-start-line="36" selection-end-line="36" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
-            <marker date="1534051545344" expanded="true" signature="579:1028" ph="..." />
-            <marker date="1534051545344" expanded="true" signature="2984:3564" ph="..." />
+            <marker date="1534127794415" expanded="true" signature="581:1030" ph="..." />
+            <marker date="1534127794415" expanded="true" signature="2986:3566" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2018.2/system/python_stubs/-1247971763/math.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="207">
+          <caret line="223" column="4" selection-start-line="223" selection-start-column="4" selection-end-line="223" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="557">
+          <caret line="105" lean-forward="true" selection-start-line="99" selection-end-line="105" />
+          <folding>
+            <marker date="1534214060219" expanded="true" signature="396:398" ph="..." />
+            <marker date="1534214060219" expanded="true" signature="428:5649" ph="..." />
+            <marker date="1534214060219" expanded="true" signature="1750:1759" ph="..." />
+            <marker date="1534214060219" expanded="true" signature="18107:19807" ph="..." />
+            <marker date="1534214060219" expanded="true" signature="20643:20647" ph="..." />
           </folding>
         </state>
       </provider>

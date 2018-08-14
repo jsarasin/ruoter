@@ -5,34 +5,167 @@ import random
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, GObject, GLib, Gdk, cairo
-import cairo
+import cairo, time
 from math import *
+
+NODE_WIDTH = 150
+NODE_HEIGHT = 200
+NODE_SPACING = 100
+DRAG_THRESHOLD = 10
+LINE_START_WIDTH = 30
+LINK_CURVE = 10
+HALF_WIDTH = NODE_WIDTH * 0.5
+HALF_HEIGHT = NODE_HEIGHT * 0.5
+TRANSITION_ANIMATION_TIME = 0.1
+
+
+class RouteVisualizerLinkPath:
+    def __init__(self, model, node_a, node_b):
+        self.path = []
+        self.model = model
+        self.node_a = node_a
+        self.node_b = node_b
+        self.old_path_type = None # For transition animation
+        self.old_path = None
+        self.path_type = None
+        self.transition_path = None
+        self.target_path = None
+
+
+    def add_straight(self, x, y):
+        self.path.append((x, y))
+
+    def add_curved(self, x, y, cx, cy):
+        curved_tuple = (x, y, cx, cy)
+        self.path.append(curved_tuple)
+
+    def clear(self):
+        self.path = []
+
+    def get_path(self):
+        if len(self.path) == 0:
+            self.gen_path()
+
+        return self.path
+
+    def gen_path(self):
+        if self.node_b['posx'] > self.node_a['posx']:
+            b_right_of = True
+        else:
+            b_right_of = False
+
+        if self.node_b['posy'] > self.node_a['posy']:
+            b_below_of = True
+        else:
+            b_below_of = False
+
+        if b_right_of:
+            dx = 1
+        else:
+            dx = -1
+
+        if b_below_of:
+            dy = 1
+        else:
+            dy = -1
+
+        horizontal_offset = abs(self.node_a['posx'] - self.node_b['posx'])
+        vertical_offset = abs(self.node_a['posy'] - self.node_b['posy'])
+        # TODO: Handle overlapping nodes nicely
+
+        # If the nodes are horizontally aligned up to 90%: Straight line from center of node A
+        if vertical_offset < HALF_HEIGHT * 0.9:
+            self.prepare_new_type(1)
+
+            self.add_straight(self.node_a['posx'] + (HALF_WIDTH * dx), self.node_a['posy'])
+            self.add_straight(self.node_b['posx'] - (HALF_WIDTH * dx), self.node_a['posy'])
+            return
+
+        # if the nodes are horizontally aligned over 90%: Offset line offset from center of node A
+        if vertical_offset >= HALF_HEIGHT * 0.9 and vertical_offset < HALF_HEIGHT:
+            self.prepare_new_type(2)
+            vertical_offset_correct = (HALF_HEIGHT * 0.9 - vertical_offset) * dy * -1
+            self.add_straight(self.node_a['posx'] + (HALF_WIDTH * dx), self.node_a['posy'] + (vertical_offset_correct))
+            self.add_straight(self.node_b['posx'] - (HALF_WIDTH * dx), self.node_a['posy'] + (vertical_offset_correct))
+            return
+
+        # If the nodes are vertically aligned up to 90%: Straight line from center of node A
+        if horizontal_offset < HALF_WIDTH * 0.9:
+            self.prepare_new_type(3)
+            self.add_straight(self.node_a['posx'], self.node_a['posy'] + (HALF_HEIGHT * dy))
+            self.add_straight(self.node_a['posx'], self.node_b['posy']- (HALF_HEIGHT * dy))
+            return
+
+        # if the nodes are vertically aligned over 90%: Offset line offset from center of node A
+        if horizontal_offset >= HALF_WIDTH * 0.9 and horizontal_offset < HALF_WIDTH:
+            self.prepare_new_type(4)
+            horizontal_offset_correct = (HALF_WIDTH * 0.9 - horizontal_offset) * dx * -1
+            self.add_straight(self.node_a['posx'] + (horizontal_offset_correct), self.node_a['posy'] + (HALF_HEIGHT * dy))
+            self.add_straight(self.node_a['posx'] + (horizontal_offset_correct), self.node_b['posy']- (HALF_HEIGHT * dy))
+            return
+
+        # If the nodes are neither horz or vert aligned yet far enough apart on the horz plane to accommodate curves...
+        # If the horizontal offset is greater than two curve sizes
+        if horizontal_offset - NODE_WIDTH > LINK_CURVE * 2 and vertical_offset > HALF_HEIGHT:
+            self.prepare_new_type(5)
+            middle_point = self.node_a['posx'] + (((horizontal_offset) / 2) * dx)
+
+            self.add_straight(self.node_a['posx'] + (HALF_WIDTH * dx), self.node_a['posy'])
+            self.add_straight(middle_point + (LINK_CURVE * dx * -1), self.node_a['posy'])
+            self.add_curved(middle_point, self.node_a['posy'],
+                            middle_point, self.node_a['posy'] + (LINK_CURVE * dy))
+            self.add_straight(middle_point, self.node_b['posy'] + (LINK_CURVE * dy * -1))
+            self.add_curved(middle_point, self.node_b['posy'],
+                            middle_point + (LINK_CURVE * dx), self.node_b['posy'])
+            self.add_straight(self.node_b['posx'] + (HALF_WIDTH * dx * -1), self.node_b['posy'])
+            return
+
+        # If the horizontal offset is smaller than two curve sizes
+        if horizontal_offset - NODE_WIDTH <= LINK_CURVE * 2 and vertical_offset > HALF_HEIGHT:
+            self.prepare_new_type(6)
+            self.add_straight(self.node_a['posx'] + (HALF_WIDTH * dx), self.node_a['posy'])
+            self.add_straight(self.node_b['posx'] + (LINK_CURVE * dx * -1), self.node_a['posy'])
+            self.add_curved(self.node_b['posx'], self.node_a['posy'],
+                            self.node_b['posx'], self.node_a['posy'] + (LINK_CURVE * dy))
+            self.add_straight(self.node_b['posx'], self.node_b['posy'] + (HALF_HEIGHT * dy * -1))
+            self.path_type = 6
+
+    def prepare_new_type(self, type):
+        if self.path_type != type:
+            self.old_path = self.path.copy()
+            self.old_path_type = self.path_type
+            self.path_type = type
+
+        self.clear()
+
+
+
+
+
+
+
+
 
 class RouteVisualizerModel(Gtk.DrawingArea):
     def __init__(self):
         self.nodes = dict()
         self.links = dict()
+        self.new_node_position = [150, 150]
 
 
     def add_node(self, key, initial_values_dict):
         if key in self.nodes.keys():
             print("Trying to add a node when one already exists with that key")
 
+        initial_values_dict['posx'] = self.new_node_position[0]
+        initial_values_dict['posy'] = self.new_node_position[1]
+        initial_values_dict['links'] = []
+
+        self.new_node_position[0] = self.new_node_position[0] + NODE_WIDTH + NODE_SPACING
         self.nodes[key] = initial_values_dict
 
-    def set_node_key_value(self, node_key, value_key, value_value):
-        if node_key not in self.nodes.keys():
-            print("Trying to set the value for a node that doesnt exist")
-            return
+        return self.nodes[key]
 
-        self.nodes[node_key][value_key] = value_value
-
-    # as links do not have a direction, source and destination don't make sense, b sounds diminutive to a
-    # the direction specified doesn't matter only the parties involved. This function will check if this connection
-    # already exists in either direction and will error if it does
-
-    # route_layer will allow the ability to represent routes that change. default would represent the first route
-    # discovered
     def add_link(self, node_a, node_b, route_layer='default'):
         # TODO: I'd like to internally order node_a and node_b based on if the entered value were stripped of . and :
         # and just be a pure hex number, whichever address has a lower value would be listed first
@@ -43,22 +176,20 @@ class RouteVisualizerModel(Gtk.DrawingArea):
 
         if node_b not in self.links[node_a]:
             self.links[node_a][node_b] = dict()
+            self.links[node_a][node_b]['path'] = RouteVisualizerLinkPath(self, self.nodes[node_a], self.nodes[node_b])
 
-        if 'route_layer' not in self.links[node_a][node_b]:
-            self.links[node_a][node_b]['route_layer'] = dict()
-        else:
-            print("This link already exists")
+            if self.links[node_a][node_b]['path'] not in self.nodes[node_a]['links']:
+                self.nodes[node_a]['links'].append(self.links[node_a][node_b]['path'])
+
+            if self.links[node_a][node_b]['path'] not in self.nodes[node_b]['links']:
+                self.nodes[node_b]['links'].append(self.links[node_a][node_b]['path'])
+
             return
 
-        self.links[node_a][node_b]['route_layer']['quality'] = 1.0  # Best quality link
+        print("Link Already exists")
 
 
 class RouteVisualizerView(Gtk.DrawingArea):
-    NODE_WIDTH = 150
-    NODE_HEIGHT = 200
-    NODE_SPACING = 100
-    DRAG_THRESHOLD = 10
-
     def __init__(self):
         super().__init__()
         self._model = None
@@ -69,6 +200,12 @@ class RouteVisualizerView(Gtk.DrawingArea):
         self.last_selected_node = None
         self.hover_over_node = False
         self.selected_nodes_count = 0
+
+        self.last_time = time.time()
+        self.transition_links = []
+        self.calling_animation_enable = False
+        self.running_animation = False
+
 
         self.set_size_request(900,500)
 
@@ -85,9 +222,10 @@ class RouteVisualizerView(Gtk.DrawingArea):
         self.connect("button-release-event", self.mouse_button_release)
         self.connect("draw", self.draw)
 
+
     def point_in_node(self, x, y):
         for node, node_keys in self._model.nodes.items():
-            if x > node_keys['posx'] and x < node_keys['posx'] + self.NODE_WIDTH and y > node_keys['posy'] and y < node_keys['posy'] + self.NODE_HEIGHT:
+            if x > node_keys['posx'] - HALF_WIDTH and x < node_keys['posx'] + HALF_WIDTH and y > node_keys['posy'] - HALF_HEIGHT and y < node_keys['posy'] + HALF_HEIGHT:
                 return node
 
         return False
@@ -112,7 +250,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
         self.clear_node_selections()
 
-        if mouse_in_node != False:
+        if mouse_in_node:
             self._model.nodes[mouse_in_node]['selected'] = True
             self.selected_nodes_count = self.selected_nodes_count + 1
             self.last_selected_node = mouse_in_node
@@ -147,7 +285,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
         if self.button1_down == True:
             self.hover_over_node = False
             if self.mouse_dragging_selection == False:
-                if abs(event.x - self.mouse_down_x) > self.DRAG_THRESHOLD or abs(event.y - self.mouse_down_y) > self.DRAG_THRESHOLD:
+                if abs(event.x - self.mouse_down_x) > DRAG_THRESHOLD or abs(event.y - self.mouse_down_y) > DRAG_THRESHOLD:
                     self.mouse_dragging_selection = True
 
         if self.mouse_dragging_selection:
@@ -173,6 +311,11 @@ class RouteVisualizerView(Gtk.DrawingArea):
                     node_keys['posx'] = node_keys['posx'] + mx
                     node_keys['posy'] = node_keys['posy'] + my
 
+                    for link in self._model.nodes[node]['links']:
+                        link.gen_path()
+
+
+
         self.queue_draw()
 
 
@@ -187,7 +330,6 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
     def draw(self, widget, cr):
         default_source_pattern = cr.get_source()
-        draw_start_left = 50
 
         cr.show_page()
         width = self.get_allocated_width()
@@ -200,17 +342,9 @@ class RouteVisualizerView(Gtk.DrawingArea):
         for node, node_keys in self._model.nodes.items():
             cr.set_source(default_source_pattern)
 
-            # Each node needs a position in our diagram, if none has been provided we'll give it a rough position
-            if 'posx' not in node_keys.keys():
-                print("Previous X not set")
-                self._model.nodes[node]['posx'] = draw_start_left
-                self._model.nodes[node]['posy'] = 50
-                draw_start_left += self.NODE_WIDTH + self.NODE_SPACING
-
-
             # Convenience
-            posx = node_keys['posx']
-            posy = node_keys['posy']
+            posx = node_keys['posx'] - HALF_WIDTH
+            posy = node_keys['posy'] - HALF_HEIGHT
             accumy = posy # I build this view by accumulating the Y value of elements
 
             # Determine if this node is selected or not
@@ -224,13 +358,13 @@ class RouteVisualizerView(Gtk.DrawingArea):
             else:
                 cr.set_source_rgba(0.3, 0.3, 0.3)
 
-            self.rounded_rectangle(cr, posx, posy, self.NODE_WIDTH, self.NODE_HEIGHT)
+            self.rounded_rectangle(cr, posx, posy, NODE_WIDTH, NODE_HEIGHT)
             cr.fill()
             if self.hover_over_node == node:
                 cr.set_source_rgba(1.0, 1.0, 1.0, 0.2)
             else:
                 cr.set_source_rgba(1.0, 1.0, 1.0, 0.1)
-            self.rounded_rectangle(cr, posx, posy, self.NODE_WIDTH, self.NODE_HEIGHT)
+            self.rounded_rectangle(cr, posx, posy, NODE_WIDTH, NODE_HEIGHT)
             cr.stroke()
 
             cr.move_to(posx, posy)
@@ -238,7 +372,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
             if node_keys['pixbuf'] is not None:
                 (curpathx, curpathy) =  cr.get_current_point()
                 imgsurf = node_keys['pixbuf']
-                cr.set_source_surface(imgsurf, curpathx + ((self.NODE_WIDTH / 2) - (imgsurf.get_width() / 2)), curpathy)
+                cr.set_source_surface(imgsurf, curpathx + ((NODE_WIDTH / 2) - (imgsurf.get_width() / 2)), curpathy)
                 cr.paint()
                 cr.set_source(default_source_pattern)
                 accumy = accumy + imgsurf.get_height()
@@ -257,230 +391,168 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
         #############
         # Now draw the links
+
+        cr.set_source(default_source_pattern)
+        cr.set_line_width(4.0)
+        cr.set_line_cap(cairo.LINE_CAP_ROUND)
+
         for node_a_name, node_b_dict in self._model.links.items():
             for node_b_name in node_b_dict.keys():
-                # Some constants
-                LINE_START_WIDTH = 30
-                LINK_CURVE = 10
+                link = self._model.links[node_a_name][node_b_name]['path']
+                line_path = link.get_path()
+                if len(line_path) == 0:
+                    continue
 
-                cr.set_source(default_source_pattern)
-                cr.set_source_rgb(0.0, 0.8, 0.0)
-                cr.set_line_width(4.0)
-                cr.set_line_cap(cairo.LINE_CAP_ROUND)
+                # If a transition animation is possible...
+                if link.old_path is not None and link.old_path != []:
+                    # And the current nodes we're working on have link types which have just changed
+                    if link.old_path_type != link.path_type:
+                        # And we're not already working on it
+                        if link not in (n[0] for n in self.transition_links):
+                            self.calling_animation_enable = False
+                            while(self.running_animation):
+                                pass
 
-                node_a = self._model.nodes[node_a_name]
-                node_b = self._model.nodes[node_b_name]
+                            link.old_path_type = link.path_type
+                            (link.target_path, link.old_path) = self.convert_path_node_count(line_path, link.old_path)
+                            link.transition_path = [(0,0)] * len(link.old_path)
+                            print("new")
+                            self.transition_links.append((link, time.time()))
+                            self.calling_animation_enable = True
+                            self.transition_animate()
+                        # Or if we are working on it
+                        else:
+                            self.calling_animation_enable = False
+                            while(self.running_animation):
+                                pass
 
-                half_width = self.NODE_WIDTH / 2
-                half_height = self.NODE_HEIGHT / 2
+                            for index, trans in enumerate(self.transition_links):
+                                if trans[0] == link:
+                                    break
+                            if index > len(self.transition_links):
+                                print("DIDNT asffd")
 
-                node_a_x = node_a['posx'] + self.NODE_WIDTH / 2
-                node_a_y = node_a['posy'] + self.NODE_HEIGHT / 2
+                            print("Transfer")
+                            link.old_path_type = link.path_type
+                            (link.target_path, link.old_path) = self.convert_path_node_count(line_path, link.target_path)
+                            link.transition_path = [(0,0)] * len(link.old_path)
 
-                node_b_x = node_b['posx'] + self.NODE_WIDTH / 2
-                node_b_y = node_b['posy'] + self.NODE_HEIGHT / 2
-
-                x_distance_between_nodes = abs(node_a_x - node_b_x) - half_width
-                y_distance_between_nodes = abs(node_a_y - node_b_y)
-
-                ax = 0  # X accumulator
-                ay = 0  # Y Accumulator
+                            self.transition_links[index] = (link, time.time())
+                            self.calling_animation_enable = True
 
 
-                if y_distance_between_nodes < half_height * 0.5:
-                    y_aligned = True
+
+
+                cr.set_source_rgb(0.8, 0.8, 0.1)
+
+                cr.set_source_rgba(0.1, 0.8, 0.1, 0.2)
+                if link.transition_path is None:
+                    self.draw_path(cr, line_path)
                 else:
-                    y_aligned = False
+                    self.draw_path(cr, link.transition_path)
 
 
-                # Draw a little nub out the side of node_a
-                if node_b_x > node_a_x + half_width:
-                    node_b_right = True
-                else:
-                    node_b_right = False
 
-                if node_b_y > node_a_y:
-                    node_b_below = True
-                else:
-                    node_b_below = False
+    def draw_path(self, cr, line_path):
+        if line_path is None:
+            return
 
-                if node_b_right:
-                    dx = 1
-                else:
-                    dx = -1
+        last_point = None
+        car = 0.0
 
+        for line_node in line_path:
+            # Move to the first point
+            if last_point is None:
+                last_point = (line_node[0], line_node[1])
+                cr.move_to(line_node[0], line_node[1])
+                continue
 
-                if node_b_below:
-                    dy = 1
-                else:
-                    dy = -1
+            # Render the first node
+            if len(line_node) == 2:
+                cr.line_to(line_node[0], line_node[1])
+                last_point = (line_node[0], line_node[1])
 
-                if node_b_right:
-                    cr.move_to(node_a_x + half_width, node_a_y)
-                    ax = node_a_x + half_width
-                    ay = node_a_y
-                else:
-                    cr.move_to(node_a_x - half_width, node_a_y)
-                    ax = node_a_x - half_width
-                    ay = node_a_y
+            # Render a curve
+            if len(line_node) == 4:
+                cr.curve_to(last_point[0], last_point[1],
+                            line_node[0], line_node[1],
+                            line_node[2], line_node[3])
+                last_point = (line_node[2], line_node[3])
 
-                # If the nodes are fairly aligned on he Y axis, then just draw the line right across
-                if y_aligned:
-                    if node_b_right:
-                        cr.line_to(node_b_x - half_width, node_a_y)
-                    else:
-                        cr.line_to(node_b_x + half_width, node_a_y)
+        cr.stroke()
 
-                if not y_aligned and x_distance_between_nodes - self.NODE_WIDTH > LINK_CURVE * 2:
-                    ax = ax + (x_distance_between_nodes - (half_width * dx)) / 2
-                    cr.line_to(ax, ay)
-                    cr.curve_to(ax, ay,
-                                ax + (LINK_CURVE * dx), ay,
-                                ax + (LINK_CURVE * dx), ay + (LINK_CURVE * dy))
+    def transition_animate(self):
+        print(".")
+        delete_animations = []
 
-                    ax = ax + (LINK_CURVE * dx)
-                    ay = node_b_y - (LINK_CURVE * dy)
+        # As this function is likely to be called from a separate thread, we need to disable its execution
+        # while the other thread is manipulating data
+        # TODO: There is the possibility of some multithreaded bugs here... Fixing would require a more complicated system
+        # Let's hope for the best eh?
+        while(not self.calling_animation_enable):
+            pass
 
-                    cr.line_to(ax, ay)
+        self.running_animation = True
 
-                    cr.curve_to(ax, ay,
-                                ax, ay + (LINK_CURVE * dy),
-                                ax + (LINK_CURVE * dx), ay + (LINK_CURVE * dy))
+        for link, start_time in self.transition_links:
+            time_delta = time.time() - start_time
+            animation_completion_perc = (time_delta / TRANSITION_ANIMATION_TIME)
 
-                    ax = ax + (LINK_CURVE * dx)
-                    ay = ay + (LINK_CURVE * dy)
+            for index in range(len(link.target_path)):
+                tx = link.target_path[index][0]
+                ty = link.target_path[index][1]
+                sx = link.old_path[index][0]
+                sy = link.old_path[index][1]
 
-                    cr.line_to(node_b_x - (half_width * dx), node_b_y)
+                movement_angle = atan2(tx - sx, (ty-sy))
+                movement_length = hypot(abs(tx - sx), abs(ty-sy))
+                dy = cos(movement_angle) * (movement_length * animation_completion_perc)
+                dx = sin(movement_angle) * (movement_length * animation_completion_perc)
 
-                if not y_aligned and x_distance_between_nodes - self.NODE_WIDTH <= LINK_CURVE * 2:
-                    cr.line_to(node_b_x - (LINK_CURVE * dx), ay)
-                    ax = node_b_x - (LINK_CURVE *dx)
+                link.transition_path[index] = (sx + dx, sy + dy)
 
-                    cr.curve_to(ax, ay,
-                                ax + (LINK_CURVE * dx), ay,
-                                ax + (LINK_CURVE * dx), ay + (LINK_CURVE * dy))
-                    ax = ax + (LINK_CURVE * dx)
-                    ay = ay + (LINK_CURVE * dy)
-                    cr.line_to(ax, node_b_y - (half_height * dy))
+            if animation_completion_perc >= 1.0:
+                delete_animations.append((link, start_time))
+                link.transition_path = None
 
+        for item in delete_animations:
+            self.transition_links.remove(item)
+            print("Delete")
 
-                cr.stroke()
+        self.queue_draw()
 
-            # first draw a line coming out the side whichever node b is on
+        if len(self.transition_links) > 0:
+            GObject.timeout_add(10, self.transition_animate)
 
-                # node_a_con_point = self.get_closest_connection_point_to(node_a, node_b)
-                # node_b_con_point = self.get_closest_connection_point_to(node_b, node_a)
-                #
-                # cr.move_to(node_a_con_point[0], node_a_con_point[1])
-                # cr.line_to(node_b_con_point[0], node_b_con_point[1])
-                # cr.stroke()
-                # print("connection %s, %s" % (l1, l2))
+        self.running_animation = False
 
-    def draw_link_horizontal(self):
-        pass
+    def convert_path_node_count(self, new_path, old_path):
+        translate_new_path = []
+        translate_old_path = []
+        if len(new_path) > len(old_path):
+            translate_new_path = new_path.copy()
+            translate_old_path = old_path.copy()
+            while len(translate_old_path) < len(new_path):
+                translate_old_path.append(old_path[len(old_path)-1])
 
-    def draw_link_vertical(self):
-        pass
+        elif len(new_path) < len(old_path):
+            translate_old_path = old_path.copy()
+            translate_new_path = new_path.copy()
+            while len(translate_new_path) < len(old_path):
+                translate_new_path.append(new_path[len(new_path) - 1])
 
-    def draw_link_offset(self):
-        pass
-
-
-    def get_closest_connection_point_to(self, this_node_name, other_node_name):
-        this_node = self._model.nodes[this_node_name]
-        other_node = self._model.nodes[other_node_name]
-
-        half_width = self.NODE_WIDTH / 2
-        half_height = self.NODE_HEIGHT / 2
-
-        this_node_x = this_node['posx'] + self.NODE_WIDTH / 2
-        this_node_y = this_node['posy'] + self.NODE_HEIGHT / 2
-
-        other_node_x = other_node['posx'] + self.NODE_WIDTH / 2
-        other_node_y = other_node['posy'] + self.NODE_HEIGHT / 2
-
-        # option[]
-
-        # if this_node_x - half_height > other_node_x:
-        #     option['top'] = this_node_x - half_height
-
-        # a = self.calc_distance(this_node_x + half_width, this_node_y, other_node_x, other_node_y) # Right
-        # b = self.calc_distance(this_node_x, this_node_y + half_height, other_node_x, other_node_y) # Bottom
-        # c = self.calc_distance(this_node_x - half_width, this_node_y, other_node_x, other_node_y) # Left
-        # d = self.calc_distance(this_node_x, this_node_y - half_height, other_node_x, other_node_y) # Top
-        #
-        # if a <= b and a <= c and a <= d:
-        #     return (this_node_x - half_width, this_node_y)
-        # if b <= a and b <= c and b <= d:
-        #     return (this_node_x, this_node_y + half_height)
-        # if c <= a and c <= b and c <= d:
-        #     return (this_node_x + half_width, this_node_y)
-        # if d <= a and d <= b and d <= c:
-        #     return (this_node_x, this_node_y - half_height)
-
-
-    def calc_distance(self, x, y, xx, yy):
-        if x > xx:
-            x, xx = xx, x
-        if y > y:
-            y, yy = yy, y
-
-        x = xx - x
-        y = yy - y
-
-        angle = atan(y/x)
-        return angle * y
-
-    def get_closest_link_path(self, node_a, node_b, route_layer='default'):
-        nodes = self._model.nodes
-
-        NODE_A = 1 # Just some constants
-        NODE_B = 2
-        TOP = 1
-        RIGHT = 2
-        BOTTOM = 3
-        LEFT = 4
-
-        node_a_left = nodes[node_a]['posx']
-        node_a_right = nodes[node_a]['posx'] + self.NODE_WIDTH
-        node_a_top = nodes[node_a]['posy']
-        node_a_bottom = nodes[node_a]['posy'] + self.NODE_HEIGHT
-
-        node_b_left = nodes[node_b]['posx']
-        node_b_right = nodes[node_b]['posx'] + self.NODE_WIDTH
-        node_b_top = nodes[node_b]['posy']
-        node_b_bottom = nodes[node_b]['posy'] + self.NODE_HEIGHT
-
-
-        if node_a_right < node_b_left:
-            node_a_line_point = self.get_node_right_side(node_a)
-            node_b_line_point = self.get_node_left_side(node_b)
         else:
-            node_a_line_point = self.get_node_left_side(node_a)
-            node_b_line_point = self.get_node_right_side(node_b)
+            translate_new_path = new_path.copy()
+            translate_old_path = old_path.copy()
 
+        return (translate_new_path, translate_old_path)
 
-        return (node_a_line_point, node_b_line_point)
-
-    def get_node_top_side(self, node):
-        x = self._model.nodes[node]['posx'] + (self.NODE_WIDTH / 2)
-        y = self._model.nodes[node]['posy']
-        return (x, y)
-
-    def get_node_right_side(self, node):
-        x = self._model.nodes[node]['posx'] + self.NODE_WIDTH
-        y = self._model.nodes[node]['posy'] + (self.NODE_HEIGHT / 2)
-        return (x, y)
-
-    def get_node_bottom_side(self, node):
-        x = self._model.nodes[node]['posx'] + (self.NODE_WIDTH / 2)
-        y = self._model.nodes[node]['posy'] + self.NODE_HEIGHT
-        return (x, y)
-
-    def get_node_left_side(self, node):
-        x = self._model.nodes[node]['posx']
-        y = self._model.nodes[node]['posy'] + (self.NODE_HEIGHT / 2)
-        return (x, y)
+    def calc_distance(self, xy, xxyy):
+        x = xy[0]
+        y = xy[1]
+        xx = xxyy[0]
+        yy = xxyy[1]
+        return sqrt((x-xx)*(x-xx) + (y-yy)*(y-yy))
 
 
     def rounded_rectangle(self, cr, x, y, w, h, r=20):

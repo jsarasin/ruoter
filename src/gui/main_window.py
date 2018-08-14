@@ -6,6 +6,7 @@ from gi.repository import Gtk, GdkPixbuf, GObject, GLib, Gdk, cairo
 from custom_controls.route_visualizer import RouteVisualizerView, RouteVisualizerModel
 import cairo
 
+
 class TraceRouteNode:
     def __init__(self, ttl, address):
         self.ttl = ttl
@@ -22,6 +23,7 @@ class TraceRouteNode:
 
     def find_device_type(self):
         pass
+
 
 class TraceRoute:
     def __init__(self, target="56.115.13.54"):
