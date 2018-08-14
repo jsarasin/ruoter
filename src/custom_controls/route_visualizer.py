@@ -324,12 +324,8 @@ class RouteVisualizerView(Gtk.DrawingArea):
                         # If the path type is the same, then the line locations have only been updated,
                         # that means if there's a transition in progress, we can change its target to match the new
                         # path.
-                        if old_path_type == link.path_type:
-                            link.get_path()
+                        if old_path_type == link.path_type and link.target_path != None:
                             link.target_path = self.granulate_path(link.get_path(), len(link.target_path))
-
-
-
 
         self.queue_draw()
 
@@ -497,6 +493,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
         cr.stroke()
 
     def transition_animate(self):
+        tstart = time.time()
         delete_animations = []
 
         # As this function is likely to be called from a separate thread, we need to disable its execution
@@ -536,9 +533,12 @@ class RouteVisualizerView(Gtk.DrawingArea):
         self.queue_draw()
 
         if len(self.transition_links) > 0:
-            GObject.timeout_add(10, self.transition_animate)
+            GObject.timeout_add(2, self.transition_animate)
 
         self.running_animation = False
+
+        tend = time.time()
+        # print("Animation Call took: ", tend - tstart)
 
     def convert_path_node_count(self, new_path, old_path):
         translate_new_path = []
