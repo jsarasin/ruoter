@@ -445,7 +445,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
                 cr.set_source_rgb(0.8, 0.8, 0.1)
 
-                cr.set_source_rgba(0.1, 0.8, 0.1, 0.2)
+                cr.set_source_rgba(0.1, 0.8, 0.1, 1.0)
                 if link.transition_path is None:
                     self.draw_path(cr, line_path)
                 else:
