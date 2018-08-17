@@ -7,6 +7,30 @@ from custom_controls.route_visualizer import RouteVisualizerView, RouteVisualize
 import cairo
 
 
+def get_pixbuf_from_filename_max_size(filename, width, height):
+    # Nice wrapper to load a pixbuf with the specified image but you can specify a max width & height where it
+    # will resize the image for you but maintain aspect ratio
+    if not os.path.isfile(filename):
+        return None
+
+    pixbuf = GdkPixbuf.Pixbuf.new_from_file(filename)
+
+    width_ratio = (width / pixbuf.get_width())
+    height_ratio = (height / pixbuf.get_height())
+
+    target_height_scaled_with_width = pixbuf.get_height() * width_ratio
+    target_width_scaled_with_height = pixbuf.get_width() * height_ratio
+
+    if target_height_scaled_with_width > width:
+        scaled_pixbuf = pixbuf.scale_simple(pixbuf.get_width() * width_ratio, target_height_scaled_with_width,
+                                            GdkPixbuf.InterpType.BILINEAR)
+    else:
+        scaled_pixbuf = pixbuf.scale_simple(target_width_scaled_with_height, pixbuf.get_height() * height_ratio,
+                                            GdkPixbuf.InterpType.BILINEAR)
+
+    return scaled_pixbuf
+
+
 class TraceRouteNode:
     def __init__(self, ttl, address):
         self.ttl = ttl
@@ -44,7 +68,9 @@ class MainWindow:
         # User Interface elements
 
         self.icon_computer = cairo.ImageSurface.create_from_png("computer.png")
+        self.icon_computer.set_device_scale(1.5, 1.5)
         self.icon_router = cairo.ImageSurface.create_from_png("router.png")
+        self.icon_router.set_device_scale(1.5, 1.5)
 
         if self.icon_computer == None or self.icon_router == None:
             print("Failed to load icons.")
@@ -97,7 +123,6 @@ class MainWindow:
                 self.route_model.add_link(last_node, tnode.address)
 
             last_node = tnode.address
-            print(last_node)
 
         # self.route_visualizer.add_hop("192.168.0.1")
         # self.route_visualizer.add_hop("43.121.23.2")
