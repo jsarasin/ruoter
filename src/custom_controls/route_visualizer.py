@@ -49,6 +49,20 @@ class RouteVisualizerLinkPath:
 
         return self.path
 
+    def mouse_over_link(self, x, y):
+        LINK_WIDTH = 3
+        for index in range(len(self.path)-1):
+            x1 = min(self.path[index][0], self.path[index+1][0]) - LINK_WIDTH
+            x2 = max(self.path[index][0], self.path[index+1][0]) + LINK_WIDTH
+            y1 = min(self.path[index][1], self.path[index+1][1]) - LINK_WIDTH
+            y2 = max(self.path[index][1], self.path[index+1][1]) + LINK_WIDTH
+
+            if x > x1 and x < x2 and y > y1 and y < y2:
+                return True
+
+        return False
+
+
     def gen_path(self):
         EDGE_ACCOMODATE_CURVE_PERCENT = 0.9
         # EDGE_ACCOMODATE_CURVE_PERCENT = 1.0
@@ -146,6 +160,8 @@ class RouteVisualizerLinkPath:
         return False
 
 
+class RouterVisualizerNode:
+    pass
 
 
 
@@ -213,6 +229,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
         self.button1_down = False
         self.last_selected_node = None
         self.hover_over_node = False
+        self.hover_over_link = False
         self.selected_nodes_count = 0
 
         self.last_time = time.time()
@@ -315,6 +332,24 @@ class RouteVisualizerView(Gtk.DrawingArea):
             if hovering != self.hover_over_node:
                 self.hover_over_node = hovering
                 self.queue_draw()
+                self.hover_over_link = False
+                return
+
+            for link in self._model.links:
+                if link.mouse_over_link(event.x, event.y):
+                    if link != self.hover_over_link:
+                        self.queue_draw()
+
+                    self.hover_over_link = link
+                    self.queue_draw()
+                    return
+
+            if self.hover_over_link != False:
+                self.queue_draw()
+
+            self.hover_over_link = False
+
+
 
 
     def move_selected_nodes(self, mx, my):
@@ -448,7 +483,11 @@ class RouteVisualizerView(Gtk.DrawingArea):
                 if link.old_path_type != link.path_type:
                     self.generate_animation(link)
 
-            cr.set_source_rgba(0.1, 0.8, 0.1, 1.0)
+            if self.hover_over_link == link:
+                cr.set_source_rgba(0.1, 1.0, 0.1, 1.0)
+            else:
+                cr.set_source_rgba(0.1, 0.8, 0.1, 1.0)
+
             if link.transition_path is None:
                 self.draw_path(cr, link.path)
             else:
