@@ -15,16 +15,16 @@
     <session id="-2130579272">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="12" />
+          <entry key="project.closed" value="14" />
           <entry key="project.open.time.0" value="4" />
           <entry key="project.open.time.1" value="3" />
           <entry key="project.open.time.2" value="1" />
           <entry key="project.open.time.4" value="1" />
-          <entry key="project.open.time.5" value="2" />
+          <entry key="project.open.time.5" value="3" />
           <entry key="project.open.time.6" value="2" />
-          <entry key="project.open.time.7" value="1" />
+          <entry key="project.open.time.7" value="2" />
           <entry key="project.open.time.8" value="1" />
-          <entry key="project.opened" value="15" />
+          <entry key="project.opened" value="17" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -40,12 +40,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="18850" />
+          <entry key="py" value="19068" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="18849" />
+          <entry key="Python" value="19067" />
           <entry key="Scratch" value="1" />
         </counts>
       </usages-collector>
@@ -59,14 +59,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="477">
-              <caret line="163" column="8" selection-start-line="163" selection-start-column="8" selection-end-line="163" selection-end-column="8" />
+            <state relative-caret-position="306">
+              <caret line="18" column="29" selection-start-line="18" selection-start-column="29" selection-end-line="18" selection-end-column="29" />
               <folding>
-                <marker date="1534490371929" expanded="true" signature="429:431" ph="..." />
-                <marker date="1534490371929" expanded="true" signature="1208:1680" ph="..." />
-                <marker date="1534490371929" expanded="true" signature="2401:2410" ph="..." />
-                <marker date="1534490371929" expanded="true" signature="6720:6737" ph="..." />
-                <marker date="1534490371929" expanded="true" signature="18745:20245" ph="..." />
+                <marker date="1534584456757" expanded="true" signature="429:431" ph="..." />
               </folding>
             </state>
           </provider>
@@ -241,7 +237,7 @@
       <window_info id="Favorites" order="2" sideWeight="0.5005066" side_tool="true" weight="0.1265625" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32928064" />
-      <window_info anchor="bottom" x="0" y="458" width="1920" height="204" id="Run" order="2" sideWeight="0.49947917" weight="0.26139817" />
+      <window_info active="true" anchor="bottom" x="0" y="458" width="1920" height="204" id="Run" order="2" sideWeight="0.49947917" visible="true" weight="0.26139817" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39918947" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -289,14 +285,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="477">
-          <caret line="163" column="8" selection-start-line="163" selection-start-column="8" selection-end-line="163" selection-end-column="8" />
+        <state relative-caret-position="306">
+          <caret line="18" column="29" selection-start-line="18" selection-start-column="29" selection-end-line="18" selection-end-column="29" />
           <folding>
-            <marker date="1534490371929" expanded="true" signature="429:431" ph="..." />
-            <marker date="1534490371929" expanded="true" signature="1208:1680" ph="..." />
-            <marker date="1534490371929" expanded="true" signature="2401:2410" ph="..." />
-            <marker date="1534490371929" expanded="true" signature="6720:6737" ph="..." />
-            <marker date="1534490371929" expanded="true" signature="18745:20245" ph="..." />
+            <marker date="1534584456757" expanded="true" signature="429:431" ph="..." />
           </folding>
         </state>
       </provider>

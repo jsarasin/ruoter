@@ -20,6 +20,7 @@ TRANSITION_ANIMATION_TIME = 0.15
 NODE_APPEAR_ANIMATION_TIME = 0.5
 
 
+
 class RouteVisualizerLinkPath:
     def __init__(self, model, node_a, node_b):
         self.path = []
@@ -161,7 +162,14 @@ class RouteVisualizerLinkPath:
 
 
 class RouterVisualizerNode:
-    pass
+    def __init__(self, identifier, hostname, ip, asn, posx=0, posy=0):
+        self.identifier = identifier
+        self.ip = ip
+        self.hostname = hostname
+        self.asn = asn
+        self.posx = posx
+        self.posy = posy
+        self.selected = False
 
 
 
@@ -236,8 +244,6 @@ class RouteVisualizerView(Gtk.DrawingArea):
         self.transition_links = []
         self.calling_animation_enable = False
         self.running_animation = False
-
-        #self.set_size_request(900,500)
 
         # setup events
         self.add_events(Gdk.EventMask.POINTER_MOTION_MASK)
