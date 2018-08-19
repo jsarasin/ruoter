@@ -8,22 +8,24 @@ class RouteVisualizerLinkPath:
         self.node_b = node_b
 
         self.path_type = None       # An ID for which type of path is being used right now
-        self.old_path_type = None   # Same as before but the previous one
 
+        self.target_path_type = None
         self.target_path = None     # Used for specifying where the animation will ultimately go.
         self.old_path = None        # Used for where the animation is coming from
+        self.old_path_type = None   # Same as before but the previous one
         self.transition_path = None # Used for where the animation is right now, Calculated from between the top two
+
+
         self.flow_last_seen = None
 
+        self.build_path = []
+
     def add_straight(self, x, y):
-        self.path.append((x, y))
+        self.build_path.append((x, y))
 
     def add_curved(self, x, y, cx, cy):
         curved_tuple = (x, y, cx, cy)
-        self.path.append(curved_tuple)
-
-    def clear(self):
-        self.path = []
+        self.build_path.append(curved_tuple)
 
     def mouse_over_link(self, x, y):
         # TODO: Make this work with not vert/horz lines
@@ -62,41 +64,39 @@ class RouteVisualizerLinkPath:
 
         # If the nodes are horizontally aligned up to EDGE_ACCOMODATE_CURVE_PERCENT%: Straight line from center of node A
         if vertical_offset < HALF_HEIGHT * EDGE_ACCOMODATE_CURVE_PERCENT:
-            self.change_new_type(1)
-
+            self.build_path = []
             self.add_straight(self.node_a.posx + (HALF_WIDTH * dx), self.node_a.posy)
             self.add_straight(self.node_b.posx - (HALF_WIDTH * dx), self.node_a.posy)
-            return
+            return (self.build_path, 1)
 
         # if the nodes are horizontally aligned over EDGE_ACCOMODATE_CURVE_PERCENT%: Offset line offset from center of node A
         if vertical_offset >= HALF_HEIGHT * EDGE_ACCOMODATE_CURVE_PERCENT and vertical_offset < HALF_HEIGHT and EDGE_ACCOMODATE_CURVE_PERCENT < 1.0:
-            self.change_new_type(2)
+            self.build_path = []
             vertical_offset_correct = (HALF_HEIGHT * EDGE_ACCOMODATE_CURVE_PERCENT - vertical_offset) * dy * -1
             self.add_straight(self.node_a.posx + (HALF_WIDTH * dx), self.node_a.posy + (vertical_offset_correct))
             self.add_straight(self.node_b.posx - (HALF_WIDTH * dx), self.node_a.posy + (vertical_offset_correct))
-            return
+            return (self.build_path, 2)
 
         # If the nodes are vertically aligned up to EDGE_ACCOMODATE_CURVE_PERCENT%: Straight line from center of node A
         if horizontal_offset < HALF_WIDTH * EDGE_ACCOMODATE_CURVE_PERCENT:
-            self.change_new_type(3)
+            self.build_path = []
             self.add_straight(self.node_a.posx, self.node_a.posy + (HALF_HEIGHT * dy))
             self.add_straight(self.node_a.posx, self.node_b.posy- (HALF_HEIGHT * dy))
-            return
+            return (self.build_path, 3)
 
         # if the nodes are vertically aligned over EDGE_ACCOMODATE_CURVE_PERCENT%: Offset line offset from center of node A
         if horizontal_offset >= HALF_WIDTH * EDGE_ACCOMODATE_CURVE_PERCENT and horizontal_offset < HALF_WIDTH and EDGE_ACCOMODATE_CURVE_PERCENT < 1.0:
-            self.change_new_type(4)
+            self.build_path = []
             horizontal_offset_correct = (HALF_WIDTH * EDGE_ACCOMODATE_CURVE_PERCENT - horizontal_offset) * dx * -1
             self.add_straight(self.node_a.posx + (horizontal_offset_correct), self.node_a.posy + (HALF_HEIGHT * dy))
             self.add_straight(self.node_a.posx + (horizontal_offset_correct), self.node_b.posy- (HALF_HEIGHT * dy))
-            return
+            return (self.build_path, 4)
 
         # If the nodes are neither horz or vert aligned yet far enough apart on the horz plane to accommodate curves...
         # If the horizontal offset is greater than two curve sizes
         if horizontal_offset - NODE_WIDTH > LINK_CURVE * 2 and vertical_offset > HALF_HEIGHT:
-            self.change_new_type(5)
+            self.build_path = []
             middle_point = self.node_a.posx + (((horizontal_offset) / 2) * dx)
-
             self.add_straight(self.node_a.posx + (HALF_WIDTH * dx), self.node_a.posy)
             self.add_straight(middle_point + (LINK_CURVE * dx * -1), self.node_a.posy)
             self.add_curved(middle_point, self.node_a.posy,
@@ -105,21 +105,14 @@ class RouteVisualizerLinkPath:
             self.add_curved(middle_point, self.node_b.posy,
                             middle_point + (LINK_CURVE * dx), self.node_b.posy)
             self.add_straight(self.node_b.posx + (HALF_WIDTH * dx * -1), self.node_b.posy)
-            return
+            return (self.build_path, 5)
 
         # If the horizontal offset is smaller than two curve sizes
         if horizontal_offset - NODE_WIDTH <= LINK_CURVE * 2 and vertical_offset > HALF_HEIGHT:
-            self.change_new_type(6)
+            self.build_path = []
             self.add_straight(self.node_a.posx + (HALF_WIDTH * dx), self.node_a.posy)
             self.add_straight(self.node_b.posx + (LINK_CURVE * dx * -1), self.node_a.posy)
             self.add_curved(self.node_b.posx, self.node_a.posy,
                             self.node_b.posx, self.node_a.posy + (LINK_CURVE * dy))
             self.add_straight(self.node_b.posx, self.node_b.posy + (HALF_HEIGHT * dy * -1))
-            self.path_type = 6
-
-    def change_new_type(self, type):
-        self.old_path = self.path
-        self.old_path_type = self.path_type
-        self.path_type = type
-        self.clear()
-        return True
+            return (self.build_path, 6)

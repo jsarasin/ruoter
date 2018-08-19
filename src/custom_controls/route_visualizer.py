@@ -18,6 +18,8 @@ HALF_WIDTH = NODE_WIDTH * 0.5
 HALF_HEIGHT = NODE_HEIGHT * 0.5
 TRANSITION_LINK_TIME = 0.15
 TRANSITION_NODE_TIME = 0.2
+ANIMATION_TICK = 40
+GRANULATED_ANIMATION_PATH_SIZE = 10
 
 from .route_visualizer_path import RouteVisualizerLinkPath
 
@@ -69,11 +71,12 @@ class RouteVisualizerModel(Gtk.DrawingArea):
 
         new_link = RouteVisualizerLinkPath(self, node_a, node_b)
         new_link.flow_last_seen = time.time()
+        new_link.path, new_link.path_type = new_link.gen_path()
+
         self.links.append(new_link)
         node_a.update_link(new_link, node_b)
         node_b.update_link(new_link, node_a)
 
-        new_link.gen_path()
 
 class RouteVisualizerView(Gtk.DrawingArea):
     def __init__(self):
@@ -89,10 +92,12 @@ class RouteVisualizerView(Gtk.DrawingArea):
         self.selected_nodes_count = 0
 
         self.last_time = time.time()
-        self.transition_links = []
-        self.transition_nodes = []
-        self.calling_animation_enable = False
-        self.running_animation = False
+        self.transition_links = []  # List of links which are undergoing an animation
+        self.transition_nodes = []  # Blah nodes
+        self.calling_animation_enable = True # For Multithreaded protection
+        self.running_animation = False # For Multithreaded protection
+        self.animation_tick_enabled = False
+
         self.dash_length = 10
         self.dash_offset = 0
 
@@ -215,48 +220,59 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
     def move_selected_nodes(self, mx, my):
         for node in self._model.nodes:
-            if node.selected:
-                node.posx = node.posx + mx
-                node.posy = node.posy + my
+            if not node.selected:
+                continue
 
-                for node_link in node.links:
-                    is_transitioning_path_type = False
-                    # print("Link", node_link)
-                    # TODO: If a link is between two selected nodes, we dont need to recalc link but just translate
-                    old_path_type = node_link.path_type
+            # Move the selected node(s)
+            node.posx = node.posx + mx
+            node.posy = node.posy + my
 
-                    while self.running_animation:
-                        pass
-                    self.calling_animation_enable = False
+            # TODO: Possible optimization: build a list of selected nodes during the initial iteration,
+            # then with that, iterate again just over them to deal with the links. This will allow translation of
+            # links instead of having to completely recalculate the route for each one if both ends of the link
+            # is part of a selected node
 
-                    if node_link.old_path_type != node_link.path_type:
-                        print("This node is transitioning")
-                        is_transitioning_path_type = True
+            # Update the links connected to that node
+            while self.running_animation:
+                pass
+            self.calling_animation_enable = False
+
+            for node_link in node.links:
+                new_path, new_path_type = node_link.gen_path()
+
+                # Different states our link can be in, in regards to animations:
+                # 1 - Same path type - just immediately change to the new path
+                # 2 - New path type, start an animations
+                # 3 - There is an animation currently:
+                #      - The new new path type is the same as the target, just a different end point
+                #      - The new path type is different than the animations end point
+                #      - Either way, we need to update the target animation data
+
+                # No current animations
+                if node_link.target_path_type is None:
+                    # The new location has the same type of path
+                    if new_path_type == node_link.path_type:
+                        node_link.path = new_path
+                    # The new location requires an animation to transition
                     else:
-                        is_transitioning_path_type = False
+                        print("New Animation")
+                        self.generate_link_animation(new_path, new_path_type, node_link)
 
-                    if node_link.old_path_type == None:
-                        is_transitioning_path_type = False
-
-                    if is_transitioning_path_type:
-                        target_path = node_link.target_path
-                        old_path = node_link.old_path
-                        node_link.gen_path()
-                        node_link.old_path = self.granulate_path(node_link.transition_path, 10)
-                        print("just hands!")
+                # There is an existing animation that we need to update
+                elif node_link.target_path is not None:
+                    # Same type of path, just move the end point and don't reset the animation
+                    if node_link.target_path_type == new_path_type:
+                        print("Update Animation")
+                        node_link.target_path = self.granulate_path(new_path, len(node_link.target_path))
+                    # Different type of path, reset the animation
                     else:
-                        print("Big time!")
-                        node_link.gen_path()
-                        self.generate_link_animation(node_link)
-                    self.calling_animation_enable = True
+                        print("Reset Animation")
+                        self.reset_link_animation(new_path, new_path_type, node_link)
 
-                    # If the path type is the same, then the line locations have only been updated,
-                    # that means if there's a transition in progress, we can change its target to match the new
-                    # path.
-                    # if old_path_type == node_link.path_type and node_link.target_path != None:
-                    #     node_link.target_path = self.granulate_path(node_link.path, len(node_link.target_path))
-                    #     node_link.old_path = self.granulate_path(node_link.old_path, 10)
+            self.calling_animation_enable = True
 
+
+        # TODO: Does this totally redraw everything? How does mark dirty work?
         self.queue_draw()
 
 
@@ -306,10 +322,6 @@ class RouteVisualizerView(Gtk.DrawingArea):
             if len(link.path) == 0:
                 continue
 
-            if link.old_path is not None and link.old_path != []:
-                if link.old_path_type != link.path_type:
-                    self.generate_link_animation(link)
-
             if self.hover_over_link == link:
                 link_color = (0.1, 1.0, 0.1, 1.0)
             else:
@@ -317,10 +329,8 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
 
             if link.transition_path is None:
-                self.now_drawing = (index, link.path)
                 link_path = link.path
             else:
-                self.now_drawing = (index, link.transition_path)
                 link_path = link.transition_path
 
             cr.set_source_rgba(link_color[0], link_color[1], link_color[2], link_color[3])
@@ -331,9 +341,6 @@ class RouteVisualizerView(Gtk.DrawingArea):
             # cr.set_source_rgba(link_color[0] + 0.1, link_color[1] + 0.1, link_color[2] + 0.1, link_color[3])
             # cr.set_dash([self.dash_length, self.dash_length], self.dash_offset)
             # self.draw_link(cr, link_path)
-
-
-
 
 
     def draw_node(self, cr, node):
@@ -420,15 +427,10 @@ class RouteVisualizerView(Gtk.DrawingArea):
             return
 
         last_point = None
-        car = 0.0
         the_dirty = [0,0,0,0]
 
         for line_node in line_path:
-            if line_node[0] < 10:
-                print("SDfJDFDLFJLSDF"*5)
-                print(self.now_drawing)
-                print("SDfJDFDLFJLSDF"*5)
-
+            # Determine the area of this control which needs updating
             if line_node[0] < the_dirty[0]:
                 the_dirty[0] = line_node[0]
             if line_node[0] > the_dirty[2]:
@@ -439,7 +441,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
             if line_node[1] > the_dirty[3]:
                 the_dirty[3] = line_node[1] - the_dirty[1]
 
-            cr. get_group_target().mark_dirty_rectangle(int(the_dirty[0]), int(the_dirty[1]), int(the_dirty[2]), int(the_dirty[3]))
+            cr.get_group_target().mark_dirty_rectangle(int(the_dirty[0]), int(the_dirty[1]), int(the_dirty[2]), int(the_dirty[3]))
 
             # Move to the first point
             if last_point is None:
@@ -462,53 +464,67 @@ class RouteVisualizerView(Gtk.DrawingArea):
         cr.stroke()
 
 
-    def generate_link_animation(self, link):
-        if link not in (n[0] for n in self.transition_links):
-            # If there is already an ongoing transition with this node we need to update it
-            self.calling_animation_enable = False
-            while (self.running_animation):
-                pass
+    def reset_link_animation(self, new_path, new_path_type, link):
 
-            link.old_path_type = link.path_type
-            link.target_path = self.granulate_path(link.path, 10)
-            link.old_path = self.granulate_path(link.old_path, 10)
+        self.calling_animation_enable = False
+        while (self.running_animation):
+            pass
 
-            link.transition_path = [(0, 0)] * len(link.old_path)
-            self.transition_links.append((link, time.time()))
-            self.calling_animation_enable = True
-            self.transition_animate()
-        # Or if we are working on it
-        else:
-            # There isn't an ongoing operation so let's create a new one
-            self.calling_animation_enable = False
-            while (self.running_animation):
-                pass
+        assert (link.target_path_type is not None)
+        link.target_path = self.granulate_path(new_path,GRANULATED_ANIMATION_PATH_SIZE)
+        link.target_path_type = new_path_type
+        link.old_path = self.granulate_path(link.path, GRANULATED_ANIMATION_PATH_SIZE)
+        link.old_path_type = link.path_type
 
-            for index, trans in enumerate(self.transition_links):
-                if trans[0] == link:
-                    break
+        # Find the index of the animation for this link and then reset the timer
+        update_index = None
+        for index, animation_item in enumerate(self.transition_links):
+            if animation_item[0] == link:
+                update_index = index
+                break
+        assert (update_index is not None)
 
-            link.old_path_type = link.path_type
+        self.transition_links[update_index] = (link, time.time())
 
-            link.target_path = self.granulate_path(link.path, 10)
-            link.old_path = self.granulate_path(link.transition_path, 10)
+        assert(len(self.transition_links) != 0)
 
-            self.transition_links[index] = (link, time.time())
-            self.calling_animation_enable = True
+    def generate_link_animation(self, new_path, new_path_type, link):
+
+        self.calling_animation_enable = False
+        while (self.running_animation):
+            pass
+
+        assert(link.target_path is None)
+
+        link.target_path = self.granulate_path(new_path, GRANULATED_ANIMATION_PATH_SIZE)
+        link.target_path_type = new_path_type
+        link.old_path = self.granulate_path(link.path, GRANULATED_ANIMATION_PATH_SIZE)
+        link.old_path_type = link.path_type
+
+        link.transition_path = [(0, 0)] * GRANULATED_ANIMATION_PATH_SIZE
+
+        self.transition_links.append((link, time.time()))
+
+        self.calling_animation_enable = True
+
+        # The animation callback will stop if it runs out of work to do, call it directly to kick it off
+        if self.animation_tick_enabled == False:
+            self.animation_tick()
+
 
     def generate_node_animation(self, node):
         self.calling_animation_enable = False
         while (self.running_animation):
             pass
 
-        if node not in self.transition_nodes:
-            self.transition_nodes.append((node, time.time()))
-            self.calling_animation_enable = True
-            self.transition_animate()
+        assert(node not in self.transition_nodes)
+
+        self.transition_nodes.append((node, time.time()))
 
         self.calling_animation_enable = True
 
-        self.queue_draw()
+        if self.animation_tick_enabled == False:
+            self.animation_tick()
 
     def transition_node_animate(self):
         delete_node_animations = []
@@ -531,6 +547,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
 
     def transition_link_animate(self):
+        # TODO: Remove when debugging is done
         if 'cat' not in dir(self):
             self.cat = 0
         else:
@@ -539,29 +556,18 @@ class RouteVisualizerView(Gtk.DrawingArea):
         if self.cat > 1:
             print ("Ffff" * 10, self.cat)
 
+
         delete_link_animations = []
         tstart = time.time()
 
         for link, start_time in self.transition_links:
             time_delta = time.time() - start_time
             animation_completion_perc = (time_delta / TRANSITION_LINK_TIME)
-            # print("com", animation_completion_perc)
             for index in range(len(link.target_path)):
                 tx = link.target_path[index][0]
                 ty = link.target_path[index][1]
-                # print("old path:", link.old_path)
-                try:
-                    sx = link.old_path[index][0]
-                    sy = link.old_path[index][1]
-                except:
-                    print("FUCK")
-                    print(index)
-                    print(link)
-                    print(link.old_path)
-                    print(link.target_path)
-                    print()
-                    import os
-                    Gtk.main_quit(1)
+                sx = link.old_path[index][0]
+                sy = link.old_path[index][1]
 
 
                 movement_angle = atan2(tx - sx, (ty-sy))
@@ -572,21 +578,27 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
                 link.transition_path[index] = (sx + dx, sy + dy)
 
+            # We can't modify the list while we're iterating over it, so add it to another list of items to
+            # delete later on
             if animation_completion_perc >= 1.0:
                 delete_link_animations.append((link, start_time))
-                link.old_path_type = link.path_type
-
-                link.transition_path = None
 
         # Remove completed animations
-        for item in delete_link_animations:
-            self.transition_links.remove(item)
+        for link, ttime in delete_link_animations:
+            link.path = link.target_path
+            link.path_type = link.target_path_type
+            link.old_path_type = None
+            link.old_path = None
+            link.transition_path = None
+            link.target_path = None
+            link.target_path_type = None
+            self.transition_links.remove((link, ttime))
 
+        # TODO: Remove when debugging is done
         self.cat = self.cat - 1
 
 
-
-    def transition_animate(self):
+    def animation_tick(self):
         tstart = time.time()
         # This is called via a Gtk Registered call back. This is what animates the transitions
 
@@ -604,7 +616,10 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
 
         if len(self.transition_links) > 0 or len(self.transition_nodes) > 0:
-            GObject.timeout_add(40, self.transition_animate)
+            GObject.timeout_add(ANIMATION_TICK, self.animation_tick)
+            self.animation_tick_enabled = True
+        else:
+            self.animation_tick_enabled = False
 
         self.running_animation = False
 
@@ -623,12 +638,15 @@ class RouteVisualizerView(Gtk.DrawingArea):
             assert(len(result) == target_node_count)
             return result
         if len(source_path) < target_node_count:
-            result = source_path.copy()
-            for x in range(target_node_count - len(source_path)-1):
-                result.append((source_path[len(source_path)-1][0], source_path[len(source_path)-1][1]))
+            USE_OLD = False
+            if USE_OLD:
+                result = source_path.copy()
+                add_count = target_node_count - len(source_path)
+                for x in range(add_count):
+                    result.append((source_path[len(source_path)-1][0], source_path[len(source_path)-1][1]))
 
-            # assert(len(result) == target_node_count)
-            return result
+                assert(len(result) == target_node_count)
+                return result
 
             new_path = []
             lengths = []
