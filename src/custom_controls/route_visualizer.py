@@ -566,7 +566,18 @@ class RouteVisualizerView(Gtk.DrawingArea):
             time_delta = time.time() - start_time
             animation_completion_perc = (time_delta / TRANSITION_LINK_TIME)
 
-            for index in range(len(link.target_path)):
+            start = 0
+            end = len(link.target_path)
+
+            if link.node_a.selected:
+                link.transition_path[0] = link.target_path[0]
+                start = start + 1
+
+            if link.node_b.selected:
+                link.transition_path[-1] = link.target_path[-1]
+                end = end - 1
+
+            for index in range(start, end):
                 tx = link.target_path[index][0]
                 ty = link.target_path[index][1]
                 sx = link.old_path[index][0]
