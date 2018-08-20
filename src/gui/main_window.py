@@ -52,19 +52,12 @@ class MainWindow:
 
             # last_node.presented = True
 
-            if previous_node:
-                self.route_model.add_link(previous_node, last_node)
-
-            previous_node = last_node
-
-
+        # Make the first node have a shit ton of connections
         nope = 0
         for cat in self.route_model.nodes:
             if nope < 2:
                 nope = nope + 1
                 continue
-
-            print("asdsadf")
             self.route_model.add_link(self.route_model.nodes[0], cat)
 
 

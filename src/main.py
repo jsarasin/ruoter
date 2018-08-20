@@ -10,6 +10,5 @@ from gui.main_window import MainWindow
 
 
 main_window = MainWindow()
-
 Gtk.main()
 

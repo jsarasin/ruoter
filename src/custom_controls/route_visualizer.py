@@ -19,7 +19,7 @@ HALF_HEIGHT = NODE_HEIGHT * 0.5
 TRANSITION_LINK_TIME = 0.15
 TRANSITION_NODE_TIME = 0.2
 ANIMATION_TICK = 1
-GRANULATED_ANIMATION_PATH_SIZE = 200
+GRANULATED_ANIMATION_PATH_SIZE = 50
 
 from .route_visualizer_path import RouteVisualizerLinkPath
 
@@ -115,7 +115,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
         self.connect("draw", self.draw)
 
         # Start the call back to animate working links
-        # GObject.timeout_add(100, self.link_animation)
+        GObject.timeout_add(100, self.link_animation)
 
     def link_animation(self):
         self.dash_offset = self.dash_offset - 1
@@ -338,9 +338,10 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
             self.draw_link(cr, link_path)
 
-            # cr.set_source_rgba(link_color[0] + 0.1, link_color[1] + 0.1, link_color[2] + 0.1, link_color[3])
-            # cr.set_dash([self.dash_length, self.dash_length], self.dash_offset)
-            # self.draw_link(cr, link_path)
+            if link.transition_path == None:
+                cr.set_source_rgba(link_color[0] + 0.1, link_color[1] + 0.1, link_color[2] + 0.1, link_color[3])
+                cr.set_dash([self.dash_length, self.dash_length], self.dash_offset)
+                self.draw_link(cr, link_path)
 
 
     def draw_node(self, cr, node):
@@ -568,20 +569,21 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
             accelerate_end = len(link.target_path)
             accelerate_start = 0
+
             if link.node_a.selected:
                 accelerate_start = len(link.target_path) * 0.3
-            elif link.node_b.selected:
+            if link.node_b.selected:
                 accelerate_end = len(link.target_path) * 0.7
 
 
-            # if link.node_b.selected:
-
+            # if link.node_b.selected:            print("\n" * 5)
             for index in range(len(link.target_path)):
                 if index < accelerate_start:
                     accel_perc = (accelerate_start - index) / accelerate_start
                     animation_completion_perc_accelerated = min(animation_completion_perc + accel_perc, 1.0)
                 elif index > accelerate_end:
-                    accel_perc = (len(link.target_path) - index) / accelerate_end
+                    end_width = len(link.target_path) - accelerate_end
+                    accel_perc = (index - accelerate_end) /  end_width
                     animation_completion_perc_accelerated = min(animation_completion_perc + accel_perc, 1.0)
 
                 else:
