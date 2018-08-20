@@ -58,6 +58,17 @@ class MainWindow:
             previous_node = last_node
 
 
+        nope = 0
+        for cat in self.route_model.nodes:
+            if nope < 2:
+                nope = nope + 1
+                continue
+
+            print("asdsadf")
+            self.route_model.add_link(self.route_model.nodes[0], cat)
+
+
+
     def connect_builder_objects(self):
         builder = Gtk.Builder()
         builder.add_from_file("gui/main.glade")

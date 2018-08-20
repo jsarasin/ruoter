@@ -18,8 +18,8 @@ HALF_WIDTH = NODE_WIDTH * 0.5
 HALF_HEIGHT = NODE_HEIGHT * 0.5
 TRANSITION_LINK_TIME = 0.15
 TRANSITION_NODE_TIME = 0.2
-ANIMATION_TICK = 40
-GRANULATED_ANIMATION_PATH_SIZE = 10
+ANIMATION_TICK = 1
+GRANULATED_ANIMATION_PATH_SIZE = 20
 
 from .route_visualizer_path import RouteVisualizerLinkPath
 
@@ -262,7 +262,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
                 elif node_link.target_path is not None:
                     # Same type of path, just move the end point and don't reset the animation
                     if node_link.target_path_type == new_path_type:
-                        print("Update Animation")
+                        # print("Update Animation")
                         node_link.target_path = self.granulate_path(new_path, len(node_link.target_path))
                     # Different type of path, reset the animation
                     else:
@@ -461,6 +461,8 @@ class RouteVisualizerView(Gtk.DrawingArea):
                             line_node[2], line_node[3])
                 last_point = (line_node[2], line_node[3])
 
+
+
         cr.stroke()
 
 
@@ -473,8 +475,8 @@ class RouteVisualizerView(Gtk.DrawingArea):
         assert (link.target_path_type is not None)
         link.target_path = self.granulate_path(new_path,GRANULATED_ANIMATION_PATH_SIZE)
         link.target_path_type = new_path_type
-        link.old_path = self.granulate_path(link.path, GRANULATED_ANIMATION_PATH_SIZE)
-        link.old_path_type = link.path_type
+        link.old_path = self.granulate_path(link.transition_path, GRANULATED_ANIMATION_PATH_SIZE)
+        link.old_path_type = "GARRY"
 
         # Find the index of the animation for this link and then reset the timer
         update_index = None
@@ -563,6 +565,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
         for link, start_time in self.transition_links:
             time_delta = time.time() - start_time
             animation_completion_perc = (time_delta / TRANSITION_LINK_TIME)
+
             for index in range(len(link.target_path)):
                 tx = link.target_path[index][0]
                 ty = link.target_path[index][1]
@@ -582,6 +585,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
             # delete later on
             if animation_completion_perc >= 1.0:
                 delete_link_animations.append((link, start_time))
+                self.queue_draw()
 
         # Remove completed animations
         for link, ttime in delete_link_animations:
@@ -625,81 +629,142 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
         # Below is useful for showing how long the animations take to process
         tend = time.time()
-        # print("Animation Call took: %.2f %s"  % ((float(tend - tstart) * 1000), "*" * int((float(tend - tstart) * 100000))))
+        tdiff = float(tend - tstart) * 1000
+        # print("Animation Call took: %.2fms %s"  % (tdiff, 0))
 
 
     def granulate_path(self, source_path, target_node_count):
-        if len(source_path) == target_node_count:
+        source_path_count = len(source_path)
+        if source_path_count == target_node_count:
             result = source_path.copy()
             assert(len(result) == target_node_count)
             return result
-        if len(source_path) > target_node_count:
+        if source_path_count > target_node_count:
             result = source_path.copy()[:target_node_count]
             assert(len(result) == target_node_count)
             return result
-        if len(source_path) < target_node_count:
-            USE_OLD = False
-            if USE_OLD:
-                result = source_path.copy()
-                add_count = target_node_count - len(source_path)
-                for x in range(add_count):
-                    result.append((source_path[len(source_path)-1][0], source_path[len(source_path)-1][1]))
-
-                assert(len(result) == target_node_count)
-                return result
-
-            new_path = []
-            lengths = []
+        if source_path_count < target_node_count:
+            original_lengths = []
+            node_shares = []
             previous_node = None
 
             # First we need to calculate the total pixel length of the entire link
             for node in source_path:
                 if previous_node != None:
                     length = self.calc_distance(previous_node, node)
-                    lengths.append(length)
+                    original_lengths.append(length)
+                    node_shares.append(None)
 
                 previous_node = node
-            total_length = sum(lengths[:])
+            total_length = sum(original_lengths[:])
+
+            # Every node in the original list is going to have at least 1 node. Therefore we will
+            # split the remaining nodes (target_node_count - original_node_count) up amongst those who
+            # deserve more
+            starting_free_nodes = target_node_count - len(original_lengths)
+            remaining_free_nodes = target_node_count - len(original_lengths) - 1
+            for index, node in enumerate(original_lengths):
+                node_perc = node/total_length
+
+                node_share = round(starting_free_nodes * node_perc)
+
+                if node_share > remaining_free_nodes:
+                    node_share = remaining_free_nodes
+
+                remaining_free_nodes = remaining_free_nodes - node_share
+
+                node_shares[index] = 1 + node_share
+
+            # If we have any remaining nodes, distribute them evenly
+            if remaining_free_nodes > 0:
+                rangy = range(0, len(node_shares), int(len(node_shares) / remaining_free_nodes))
+
+                for index in rangy:
+                    node_shares[index] = node_shares[index] + 1
+                    remaining_free_nodes = remaining_free_nodes - 1
+
+            assert(remaining_free_nodes == 0)
+
+            # Now build the new granulated line
+            new_path = []
+            for index in range(source_path_count-1):
+                start = source_path[index]
+                end = source_path[index+1]
+                segments = node_shares[index]
+                original_length = None
+
+                new_path = new_path + self.interpolate_line(start, end, segments, original_length, True)
+
+            new_path = new_path + [source_path[-1]]
 
 
-            # Now we need to iterate over each of the old nodes and break them up depending on their proportion
-            previous_node = None
-            for index, node in enumerate(source_path[:]):
-                if previous_node is not None:
-                    total_length_for_node = lengths[index-1] / total_length
-                    subdivide_count = max((round(subdivide_percent * len(source_path)), 1))
-                    subdivide_amount = subdivide_percent * total_length
-                    print("Index", index, round(subdivide_percent*100), "%", subdivide_count)
-                    #print("Index", index, "gets", subdivide_count, "length is:", lengths[index-1])
-                    tx = previous_node[0]
-                    ty = previous_node[1]
-                    sx = node[0]
-                    sy = node[1]
-
-                    if tx == sx and ty < sy:
-                        movement_angle = 0
-                    elif tx == sx and ty > sy:
-                        movement_angle = pi
-                    elif ty == sy and tx < sx:
-                        movement_angle = pi * 1.5
-                    elif ty == sy and tx > sx:
-                        movement_angle = pi * 0.5
-                    else:
-                        movement_angle = atan2(tx - sx, (ty - sy))
-
-                    dx = 0
-                    dy = 0
-                    for index in range(int(subdivide_percent * target_node_count)):
-                        dy = dy + cos(movement_angle) * (subdivide_amount)
-                        dx = dx + sin(movement_angle) * (subdivide_amount)
-
-                        new_path.append((dx, dy))
-
-
-                previous_node = node
-
+            # print()
+            # print("Source        | New")
+            # print("%2i            | %2i" % (len(source_path), len(new_path)))
+            # print("--------------|----------------")
+            # new_index = 0
+            # for index in range(len(source_path)-1):
+            #     print("%7.0f%7.0f|%7.0f%7.0f" % (source_path[index][0],source_path[index][1], new_path[new_index][0], new_path[new_index][1]))
+            #     new_index = new_index + 1
+            #     for cat in range(node_shares[index]-1):
+            #         print("              |%7.0f%7.0f" % (new_path[new_index][0], new_path[new_index][1]))
+            #         new_index = new_index + 1
+            #     print("              |")
+            #
+            # print("%7.0f%7.0f|%7.0f%7.0f" % (source_path[-1][0],source_path[-1][1], new_path[-1][0], new_path[-1][1]))
 
             return new_path
+
+    def interpolate_line(self, p1, p2, segments, original_length=None, skip_last=False):
+        # Take two source coordinates and break it up into separate segments.
+        # @param skip_last: Don't add p2 onto the end of this node, this makes
+        #                   it suitable for a line path.
+        if segments < 1:
+            raise ValueError
+        if segments == 1:
+            if skip_last:
+                return [p1]
+            else:
+                return [p1, p2]
+
+
+        new_line_path = []
+
+        tx = p1[0]
+        ty = p1[1]
+        sx = p2[0]
+        sy = p2[1]
+
+        if tx == sx and ty < sy:
+            movement_angle = 0
+        elif tx == sx and ty > sy:
+            movement_angle = pi
+        elif ty == sy and tx < sx:
+            movement_angle = pi * 1.5
+        elif ty == sy and tx > sx:
+            movement_angle = pi * 0.5
+        else:
+            movement_angle = atan2(tx - sx, (ty - sy))
+
+        if original_length is None:
+            original_length = hypot(abs(tx - sx), abs(ty-sy))
+
+        movement_amount = original_length / segments
+
+        dx = tx
+        dy = ty
+        new_line_path.append((dx, dy))
+
+        for _ in range(segments - 1):
+            dx = dx - sin(movement_angle) * (movement_amount)
+            dy = dy + cos(movement_angle) * (movement_amount)
+
+            new_line_path.append((dx, dy))
+
+        if not skip_last:
+            new_line_path.append(p2)
+
+        return new_line_path
 
 
     def calc_distance(self, xy, xxyy):

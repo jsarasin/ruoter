@@ -39,7 +39,7 @@ class TraceRoute:
             random_ip = random_ip + str(randint(1, 253))
             return random_ip
 
-        for i in range(4):
+        for i in range(10):
             self.nodes.append(TraceRouteNode(i, randomIP()))
 
         self.target = self.nodes[-1].ip
