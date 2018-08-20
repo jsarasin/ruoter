@@ -43,13 +43,13 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="25" />
-          <entry key="py" value="39129" />
+          <entry key="py" value="39477" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="25" />
-          <entry key="Python" value="39128" />
+          <entry key="Python" value="39476" />
           <entry key="Scratch" value="1" />
         </counts>
       </usages-collector>
@@ -72,12 +72,12 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="381">
-              <caret line="576" column="62" selection-start-line="576" selection-start-column="62" selection-end-line="576" selection-end-column="62" />
+            <state relative-caret-position="440">
+              <caret line="21" column="36" selection-start-line="21" selection-start-column="36" selection-end-line="21" selection-end-column="36" />
               <folding>
-                <marker date="1534732858516" expanded="true" signature="16569:17440" ph="..." />
-                <marker date="1534732858516" expanded="true" signature="24578:24884" ph="..." />
-                <marker date="1534732858516" expanded="true" signature="26800:27757" ph="..." />
+                <marker date="1534734930313" expanded="true" signature="16570:17441" ph="..." />
+                <marker date="1534734930313" expanded="true" signature="25190:25496" ph="..." />
+                <marker date="1534734930313" expanded="true" signature="27412:28369" ph="..." />
               </folding>
             </state>
           </provider>
@@ -112,7 +112,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>ffff 1</find>
       <find>self.cat = self.cat - 1</find>
       <find>old_path =</find>
       <find>old path size</find>
@@ -142,6 +141,7 @@
       <find>Animation call</find>
       <find>animation call to</find>
       <find>update anima</find>
+      <find>animation</find>
     </findStrings>
     <replaceStrings>
       <replace>NODE_HEIGHT</replace>
@@ -316,12 +316,12 @@
     <frame x="0" y="30" width="1920" height="1049" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.39958805" visible="true" weight="0.19583334" />
-      <window_info id="Structure" order="1" sideWeight="0.60041195" side_tool="true" visible="true" weight="0.19583334" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.39863014" visible="true" weight="0.19583334" />
+      <window_info id="Structure" order="1" sideWeight="0.60136986" side_tool="true" visible="true" weight="0.19583334" />
       <window_info id="Favorites" order="2" sideWeight="0.5005066" side_tool="true" weight="0.1265625" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.22760041" />
-      <window_info anchor="bottom" x="0" y="458" width="1920" height="204" id="Run" order="2" sideWeight="0.49895832" weight="0.31410918" />
+      <window_info active="true" anchor="bottom" x="0" y="458" width="1920" height="204" id="Run" order="2" sideWeight="0.49895832" visible="true" weight="0.24819773" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.24375" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -428,12 +428,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="381">
-          <caret line="576" column="62" selection-start-line="576" selection-start-column="62" selection-end-line="576" selection-end-column="62" />
+        <state relative-caret-position="440">
+          <caret line="21" column="36" selection-start-line="21" selection-start-column="36" selection-end-line="21" selection-end-column="36" />
           <folding>
-            <marker date="1534732858516" expanded="true" signature="16569:17440" ph="..." />
-            <marker date="1534732858516" expanded="true" signature="24578:24884" ph="..." />
-            <marker date="1534732858516" expanded="true" signature="26800:27757" ph="..." />
+            <marker date="1534734930313" expanded="true" signature="16570:17441" ph="..." />
+            <marker date="1534734930313" expanded="true" signature="25190:25496" ph="..." />
+            <marker date="1534734930313" expanded="true" signature="27412:28369" ph="..." />
           </folding>
         </state>
       </provider>

@@ -19,7 +19,7 @@ HALF_HEIGHT = NODE_HEIGHT * 0.5
 TRANSITION_LINK_TIME = 0.15
 TRANSITION_NODE_TIME = 0.2
 ANIMATION_TICK = 1
-GRANULATED_ANIMATION_PATH_SIZE = 20
+GRANULATED_ANIMATION_PATH_SIZE = 200
 
 from .route_visualizer_path import RouteVisualizerLinkPath
 
@@ -566,29 +566,38 @@ class RouteVisualizerView(Gtk.DrawingArea):
             time_delta = time.time() - start_time
             animation_completion_perc = (time_delta / TRANSITION_LINK_TIME)
 
-            start = 0
-            end = len(link.target_path)
-
+            accelerate_end = len(link.target_path)
+            accelerate_start = 0
             if link.node_a.selected:
-                link.transition_path[0] = link.target_path[0]
-                start = start + 1
+                accelerate_start = len(link.target_path) * 0.3
+            elif link.node_b.selected:
+                accelerate_end = len(link.target_path) * 0.7
 
-            if link.node_b.selected:
-                link.transition_path[-1] = link.target_path[-1]
-                end = end - 1
 
-            for index in range(start, end):
+            # if link.node_b.selected:
+
+            for index in range(len(link.target_path)):
+                if index < accelerate_start:
+                    accel_perc = (accelerate_start - index) / accelerate_start
+                    animation_completion_perc_accelerated = min(animation_completion_perc + accel_perc, 1.0)
+                elif index > accelerate_end:
+                    accel_perc = (len(link.target_path) - index) / accelerate_end
+                    animation_completion_perc_accelerated = min(animation_completion_perc + accel_perc, 1.0)
+
+                else:
+                    animation_completion_perc_accelerated = animation_completion_perc
+
+
                 tx = link.target_path[index][0]
                 ty = link.target_path[index][1]
                 sx = link.old_path[index][0]
                 sy = link.old_path[index][1]
 
-
                 movement_angle = atan2(tx - sx, (ty-sy))
                 movement_length = hypot(abs(tx - sx), abs(ty-sy))
 
-                dy = cos(movement_angle) * (movement_length * animation_completion_perc)
-                dx = sin(movement_angle) * (movement_length * animation_completion_perc)
+                dy = cos(movement_angle) * (movement_length * animation_completion_perc_accelerated)
+                dx = sin(movement_angle) * (movement_length * animation_completion_perc_accelerated)
 
                 link.transition_path[index] = (sx + dx, sy + dy)
 
