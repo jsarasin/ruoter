@@ -23,8 +23,6 @@ class TraceRoute:
         self.target = target
         self.nodes = []
 
-        self.run_test()
-
     def run_traceroute(self):
         self.nodes.append(TraceRouteNode(2, "65.94.12.6"))
         self.nodes.append(TraceRouteNode(3, "65.94.12.6"))
@@ -39,8 +37,8 @@ class TraceRoute:
             random_ip = random_ip + str(randint(1, 253))
             return random_ip
 
-        for i in range(10):
-            self.nodes.append(TraceRouteNode(i, randomIP()))
+        self.nodes.append(TraceRouteNode(0, "192.168.0.1"))
+        for i in range(4):
+            self.nodes.append(TraceRouteNode(i+1, randomIP()))
 
-        self.target = self.nodes[-1].ip
-
+        self.nodes.append(TraceRouteNode(i+2, self.target))
