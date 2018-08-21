@@ -1,4 +1,6 @@
 from random import randint
+import scapy.all
+import time
 
 class TraceRouteNode:
     def __init__(self, ttl, ip):
@@ -22,11 +24,19 @@ class TraceRoute:
     def __init__(self, target):
         self.target = target
         self.nodes = []
+        self.hops = []
 
-    def run_traceroute(self):
-        self.nodes.append(TraceRouteNode(2, "65.94.12.6"))
-        self.nodes.append(TraceRouteNode(3, "65.94.12.6"))
-        pass
+    def start_traceroute(self, target):
+        self.target = target
+        answers = []
+
+        for n in range(9):
+            scapy.
+            ans, unans = sr(IP(dst=target, ttl=n,id=RandShort())/TCP(flags=0x2))
+            answers = answers + [ans]
+
+        # time.sleep(1)
+
 
     def run_test(self):
         def randomIP():
@@ -37,8 +47,19 @@ class TraceRoute:
             random_ip = random_ip + str(randint(1, 253))
             return random_ip
 
-        self.nodes.append(TraceRouteNode(0, "192.168.0.1"))
-        for i in range(4):
-            self.nodes.append(TraceRouteNode(i+1, randomIP()))
+        self.register_hop_response(0, "192.168.0.1")
+        for i in range(3):
+            self.register_hop_response(i+1, "192.168.0.1")
+        self.register_hop_response(i+2, self.target)
 
-        self.nodes.append(TraceRouteNode(i+2, self.target))
+
+
+        self.nodes = self.nodes + [TraceRouteNode(0, "192.168.0.1")]
+        for i in range(3):
+            self.nodes = self.nodes + [TraceRouteNode(i+1, randomIP())]
+
+        self.nodes = self.nodes + [TraceRouteNode(i+2, self.target)]
+
+    def register_hop_response(self, ttl, ip):
+        pass
+#        if ip not in [n for n in self.nodes[]]

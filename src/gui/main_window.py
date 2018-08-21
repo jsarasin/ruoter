@@ -8,6 +8,7 @@ from custom_controls.route_visualizer import RouteVisualizerView, RouteVisualize
 import cairo
 from net.traceroute import TraceRouteNode, TraceRoute
 
+
 class MainWindow:
     def __init__(self):
         self.new_node = None
@@ -33,7 +34,8 @@ class MainWindow:
         self.route_visualizer.set_hexpand(True)
         self.route_visualizer.set_vexpand(True)
 
-        self.trace_route = TraceRoute("cat")
+        self.trace_route = TraceRoute("1.1.1.1")
+        self.trace_route.run_test()
 
         self.update_route_model_from_traceroute()
         self.route_model.new_node_position = [75, 250]
@@ -50,15 +52,15 @@ class MainWindow:
             last_node = self.route_model.add_node(tnode.ip)
             last_node.pixbuf = pixbuf
 
-            # last_node.presented = True
+            last_node.presented = True
 
         # Make the first node have a shit ton of connections
-        nope = 0
-        for cat in self.route_model.nodes:
-            if nope < 2:
-                nope = nope + 1
-                continue
-            self.route_model.add_link(self.route_model.nodes[0], cat)
+        # nope = 0
+        # for cat in self.route_model.nodes:
+        #     if nope < 2:
+        #         nope = nope + 1
+        #         continue
+        #     self.route_model.add_link(self.route_model.nodes[0], cat)
 
 
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import socket
 import struct
@@ -6,20 +6,21 @@ import sys
 
 # We want unbuffered stdout so we can provide live feedback for
 # each TTL. You could also use the "-u" flag to Python.
-class flushfile(file):
-    def __init__(self, f):
-        self.f = f
-    def write(self, x):
-        self.f.write(x)
-        self.f.flush()
-
-sys.stdout = flushfile(sys.stdout)
+# class flushfile(file):
+#     def __init__(self, f):
+#         self.f = f
+#     def write(self, x):
+#         self.f.write(x)
+#         self.f.flush()
+#
+# sys.stdout = flushfile(sys.stdout)
 
 def main(dest_name):
     dest_addr = socket.gethostbyname(dest_name)
     port = 33434
     max_hops = 30
     icmp = socket.getprotobyname('icmp')
+    print(type(icmp))
     udp = socket.getprotobyname('udp')
     ttl = 1
     while True:
@@ -35,7 +36,7 @@ def main(dest_name):
         
         recv_socket.bind(("", port))
         sys.stdout.write(" %d  " % ttl)
-        send_socket.sendto("", (dest_name, port))
+        send_socket.sendto(b"", (dest_name, port))
         curr_addr = None
         curr_name = None
         finished = False
@@ -49,7 +50,7 @@ def main(dest_name):
                     curr_name = socket.gethostbyaddr(curr_addr)[0]
                 except socket.error:
                     curr_name = curr_addr
-            except socket.error as (errno, errmsg):
+            except socket.error:# as (errno, errmsg):
                 tries = tries - 1
                 sys.stdout.write("* ")
         
