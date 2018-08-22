@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated with glade 3.22.1 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
+  <requires lib="gtk+" version="3.18"/>
   <object class="GtkImage" id="image1">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-media-play</property>
-  </object>
-  <object class="GtkTextBuffer" id="textbuffer1">
-    <property name="text" translatable="yes">This type of route discovery will send out an IP PDUs with an increasing TTL with a TCP packet inside of that simply with the SYN flag set to a port of your choosing.</property>
   </object>
   <object class="GtkDialog" id="window_traceroute_ping">
     <property name="width_request">585</property>
@@ -449,5 +446,8 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer1">
+    <property name="text" translatable="yes">This type of route discovery will send out an IP PDUs with an increasing TTL with a TCP packet inside of that simply with the SYN flag set to a port of your choosing.</property>
   </object>
 </interface>
