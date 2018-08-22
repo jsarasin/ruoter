@@ -1,5 +1,5 @@
 from random import randint
-import scapy.all
+from scapy.all import *
 import time
 
 class TraceRouteNode:
@@ -31,7 +31,7 @@ class TraceRoute:
         answers = []
 
         for n in range(9):
-            scapy.
+
             ans, unans = sr(IP(dst=target, ttl=n,id=RandShort())/TCP(flags=0x2))
             answers = answers + [ans]
 
@@ -49,17 +49,15 @@ class TraceRoute:
 
         self.register_hop_response(0, "192.168.0.1")
         for i in range(3):
-            self.register_hop_response(i+1, "192.168.0.1")
+            self.register_hop_response(i+1, randomIP())
         self.register_hop_response(i+2, self.target)
 
-
-
-        self.nodes = self.nodes + [TraceRouteNode(0, "192.168.0.1")]
-        for i in range(3):
-            self.nodes = self.nodes + [TraceRouteNode(i+1, randomIP())]
-
-        self.nodes = self.nodes + [TraceRouteNode(i+2, self.target)]
+        #
+        # self.nodes = self.nodes + [TraceRouteNode(0, "192.168.0.1")]
+        # for i in range(3):
+        #     self.nodes = self.nodes + [TraceRouteNode(i+1, randomIP())]
+        #
+        # self.nodes = self.nodes + [TraceRouteNode(i+2, self.target)]
 
     def register_hop_response(self, ttl, ip):
-        pass
-#        if ip not in [n for n in self.nodes[]]
+        self.nodes = self.nodes + [TraceRouteNode(ttl, ip)]

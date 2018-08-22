@@ -6,11 +6,18 @@ from gi.repository import Gtk, GdkPixbuf, GObject, GLib
 
 import os
 
-# from gui.main_window import MainWindow
-#
-# main_window = MainWindow()
+from gui.main_window import MainWindow
+from gui.new_traceroute_ping import NewTraceroutePing
+
+main_window = MainWindow()
+Gtk.main()
+
+
+# newtp = NewTraceroutePing()
 # Gtk.main()
 
+
+quit()
 
 from net.traceroute import TraceRoute
 
