@@ -245,6 +245,8 @@ class RouteVisualizerView(Gtk.DrawingArea):
             self.calling_animation_enable = False
 
             for node_link in node.links:
+                if node_link == None:
+                    print("Hmm Why is this randomly happening. (On windows anyway)")
                 new_path, new_path_type = node_link.gen_path()
 
                 # Different states our link can be in, in regards to animations:
