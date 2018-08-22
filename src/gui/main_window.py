@@ -73,7 +73,7 @@ class MainWindow:
         ntrp = TraceroutePingInterface()
         self.traceroute_ping_interfaces.append(ntrp)
 
-        notebook_label = Gtk.Label("Catsoup")
+        notebook_label = Gtk.Label(configuration['target_host'])
 
         builder = Gtk.Builder()
         builder.add_from_file("gui/main.glade")
@@ -86,7 +86,7 @@ class MainWindow:
         ntrp.input_target_host.set_text(configuration['target_host'])
 
         ntrp.route_model = RouteVisualizerModel()
-        ntrp.route_model.new_node_position = [75, 250]
+        ntrp.route_model.new_node_position = [0, 0]
 
         ntrp.visualizer = RouteVisualizerView()
         ntrp.visualizer.set_model(ntrp.route_model)

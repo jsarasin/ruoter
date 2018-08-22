@@ -6,6 +6,7 @@ class RouteVisualizerLinkPath:
         self.model = model
         self.node_a = node_a
         self.node_b = node_b
+        self.selected = False
 
         self.path_type = None       # An ID for which type of path is being used right now
 
@@ -29,7 +30,7 @@ class RouteVisualizerLinkPath:
 
     def mouse_over_link(self, x, y):
         # TODO: Make this work with not vert/horz lines
-        LINK_WIDTH = 3
+        LINK_WIDTH = 7
         for index in range(len(self.path)-1):
             x1 = min(self.path[index][0], self.path[index+1][0]) - LINK_WIDTH
             x2 = max(self.path[index][0], self.path[index+1][0]) + LINK_WIDTH

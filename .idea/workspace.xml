@@ -2,14 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d21c28ba-aaac-44bf-a7cd-25687c9e143e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/gui/new_traceroute_ping.glade" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gui/new_traceroute_ping.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/src/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/main.glade" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/main.glade" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/custom_controls/route_visualizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/custom_controls/route_visualizer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/custom_controls/route_visualizer_path.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/custom_controls/route_visualizer_path.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/main_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/main_window.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/net/traceroute.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/net/traceroute.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -39,13 +34,13 @@
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="gitignore" value="1" />
-          <entry key="py" value="50" />
+          <entry key="py" value="51" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="PLAIN_TEXT" value="1" />
-          <entry key="Python" value="49" />
+          <entry key="Python" value="50" />
           <entry key="Scratch" value="1" />
         </counts>
       </usages-collector>
@@ -53,13 +48,13 @@
         <counts>
           <entry key="dummy" value="25" />
           <entry key="gitignore" value="13" />
-          <entry key="py" value="42268" />
+          <entry key="py" value="42608" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="38" />
-          <entry key="Python" value="42267" />
+          <entry key="Python" value="42607" />
           <entry key="Scratch" value="1" />
         </counts>
       </usages-collector>
@@ -69,7 +64,7 @@
     <favorites_list name="ruoter" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.7117611">
+    <splitter split-orientation="horizontal" split-proportion="0.77757466">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
@@ -84,11 +79,11 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/gui/main_window.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-4">
-                  <caret line="78" column="34" selection-start-line="78" selection-start-column="34" selection-end-line="78" selection-end-column="34" />
+                <state relative-caret-position="282">
+                  <caret line="88" column="42" selection-start-line="88" selection-start-column="25" selection-end-line="88" selection-end-column="42" />
                   <folding>
                     <element signature="e#0#9#0" expanded="true" />
-                    <marker date="1534911584770" expanded="true" signature="2367:3581" ph="..." />
+                    <marker date="1534912518328" expanded="true" signature="2367:3597" ph="..." />
                   </folding>
                 </state>
               </provider>
@@ -97,16 +92,25 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer_path.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1100">
-                  <caret line="50" selection-start-line="50" selection-end-line="50" />
+                <state relative-caret-position="220">
+                  <caret line="10" column="28" lean-forward="true" selection-start-line="10" selection-start-column="28" selection-end-line="10" selection-end-column="28" />
                 </state>
               </provider>
             </entry>
           </file>
           <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="347">
+                  <caret line="157" column="51" lean-forward="true" selection-start-line="157" selection-start-column="51" selection-end-line="157" selection-end-column="51" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/gui/new_traceroute_ping.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="351">
+                <state relative-caret-position="1209">
                   <caret line="56" column="70" selection-start-line="56" selection-start-column="70" selection-end-line="56" selection-end-column="70" />
                   <folding>
                     <element signature="e#0#9#0" expanded="true" />
@@ -123,8 +127,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/net/traceroute.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="309">
-                  <caret line="52" column="52" selection-start-line="52" selection-start-column="52" selection-end-line="52" selection-end-column="52" />
+                <state relative-caret-position="549">
+                  <caret line="60" lean-forward="true" selection-start-line="60" selection-end-line="60" />
                   <folding>
                     <element signature="e#0#26#0" expanded="true" />
                   </folding>
@@ -145,10 +149,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>old_path =</find>
-      <find>old path size</find>
-      <find>old path:</find>
-      <find>link:</find>
       <find>&quot;update</find>
       <find>transition_path =</find>
       <find>anima</find>
@@ -175,6 +175,10 @@
       <find>update anima</find>
       <find>animation</find>
       <find>all</find>
+      <find>new_node_position</find>
+      <find>set_size_</find>
+      <find>self.links</find>
+      <find>hover_over_link</find>
     </findStrings>
     <replaceStrings>
       <replace>NODE_HEIGHT</replace>
@@ -192,14 +196,14 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.py" />
-        <option value="$PROJECT_DIR$/src/custom_controls/route_visualizer_path.py" />
-        <option value="$PROJECT_DIR$/src/custom_controls/route_visualizer.py" />
         <option value="$PROJECT_DIR$/src/python-traceroute.py" />
         <option value="$PROJECT_DIR$/src/.gitignore" />
         <option value="$PROJECT_DIR$/src/main.py" />
         <option value="$PROJECT_DIR$/src/net/traceroute.py" />
-        <option value="$PROJECT_DIR$/src/gui/main_window.py" />
         <option value="$PROJECT_DIR$/src/gui/new_traceroute_ping.py" />
+        <option value="$PROJECT_DIR$/src/gui/main_window.py" />
+        <option value="$PROJECT_DIR$/src/custom_controls/route_visualizer_path.py" />
+        <option value="$PROJECT_DIR$/src/custom_controls/route_visualizer.py" />
       </list>
     </option>
   </component>
@@ -380,12 +384,12 @@
     <frame x="0" y="30" width="1920" height="1049" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.5613793" visible="true" weight="0.1453125" />
-      <window_info id="Structure" order="1" sideWeight="0.4376931" side_tool="true" weight="0.14635417" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.27664974" visible="true" weight="0.1453125" />
+      <window_info active="true" id="Structure" order="1" sideWeight="0.7233502" side_tool="true" visible="true" weight="0.1453125" />
       <window_info id="Favorites" order="2" sideWeight="0.4386207" side_tool="true" weight="0.14635417" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.22760041" />
-      <window_info active="true" anchor="bottom" x="0" y="458" width="1920" height="204" id="Run" order="2" sideWeight="0.49791667" visible="true" weight="0.3377961" />
+      <window_info anchor="bottom" x="0" y="458" width="1920" height="204" id="Run" order="2" sideWeight="0.49791667" visible="true" weight="0.1884655" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.24375" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -462,13 +466,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/lib/python2.7/socket.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4114">
@@ -531,42 +528,49 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer_path.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1100">
-          <caret line="50" selection-start-line="50" selection-end-line="50" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/net/traceroute.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="52" column="52" selection-start-line="52" selection-start-column="52" selection-end-line="52" selection-end-column="52" />
+        <state relative-caret-position="549">
+          <caret line="60" lean-forward="true" selection-start-line="60" selection-end-line="60" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/gui/main_window.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4">
-          <caret line="78" column="34" selection-start-line="78" selection-start-column="34" selection-end-line="78" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-            <marker date="1534911584770" expanded="true" signature="2367:3581" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/gui/new_traceroute_ping.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="351">
+        <state relative-caret-position="1209">
           <caret line="56" column="70" selection-start-line="56" selection-start-column="70" selection-end-line="56" selection-end-column="70" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
             <marker date="1534911629310" expanded="true" signature="1734:1740" ph="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gui/main_window.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="282">
+          <caret line="88" column="42" selection-start-line="88" selection-start-column="25" selection-end-line="88" selection-end-column="42" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+            <marker date="1534912518328" expanded="true" signature="2367:3597" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer_path.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="10" column="28" lean-forward="true" selection-start-line="10" selection-start-column="28" selection-end-line="10" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="347">
+          <caret line="157" column="51" lean-forward="true" selection-start-line="157" selection-start-column="51" selection-end-line="157" selection-end-column="51" />
         </state>
       </provider>
     </entry>

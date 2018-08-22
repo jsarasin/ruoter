@@ -51,14 +51,14 @@ class RouteVisualizerModel(Gtk.DrawingArea):
     def __init__(self):
         self.nodes = []
         self.links = []
-        self.new_node_position = [HALF_WIDTH + 10, HALF_HEIGHT + 10]
+        self.new_node_position = [0, 0]
 
 
     def add_node(self, ip):
         new_node = RouteVisualizerNode(ip)
         new_node.add_time = time.time()
-        new_node.posx = self.new_node_position[0]
-        new_node.posy = self.new_node_position[1]
+        new_node.posx = self.new_node_position[0] + HALF_WIDTH + 10
+        new_node.posy = self.new_node_position[1] + HALF_HEIGHT + 10
         self.new_node_position[0] = self.new_node_position[0] + NODE_WIDTH + NODE_SPACING
 
         self.nodes.append(new_node)
@@ -88,8 +88,10 @@ class RouteVisualizerView(Gtk.DrawingArea):
         self.button1_down = False
         self.last_selected_node = None
         self.hover_over_node = False
-        self.hover_over_link = False
+        self.hover_over_link = None
+        self.selected_link = None
         self.selected_nodes_count = 0
+
 
         self.last_time = time.time()
         self.transition_links = []  # List of links which are undergoing an animation
@@ -148,11 +150,16 @@ class RouteVisualizerView(Gtk.DrawingArea):
         #     control_in = False
 
         self.clear_node_selections()
+        self.selected_link = None
 
         if mouse_in_node:
             mouse_in_node.selected = True
             self.selected_nodes_count = self.selected_nodes_count + 1
             self.last_selected_node = mouse_in_node
+
+        if self.hover_over_link is not None:
+            self.hover_over_link.selected = True
+            self.selected_link = self.hover_over_link
 
         self.queue_draw()
         pass
@@ -213,7 +220,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
             if self.hover_over_link:
                 self.queue_draw()
 
-            self.hover_over_link = False
+            self.hover_over_link = None
 
 
 
@@ -303,11 +310,11 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
             cr.set_matrix(matrix)
 
-            if node.posx + NODE_WIDTH > size_bounds[0]:
-                size_bounds[0] = node.posx + NODE_WIDTH
+            if node.posx + HALF_WIDTH > size_bounds[0]:
+                size_bounds[0] = node.posx + HALF_WIDTH
 
-            if node.posy + NODE_HEIGHT > size_bounds[1]:
-                size_bounds[1] = node.posy + NODE_HEIGHT
+            if node.posy + HALF_HEIGHT > size_bounds[1]:
+                size_bounds[1] = node.posy + HALF_HEIGHT
 
         self.set_size_request(size_bounds[0], size_bounds[1])
 
@@ -315,8 +322,6 @@ class RouteVisualizerView(Gtk.DrawingArea):
         ####################################################
         # Now draw the links
 
-        cr.set_line_width(4.0)
-        cr.set_line_cap(cairo.LINE_CAP_ROUND)
 
         for index, link in enumerate(self._model.links):
             if len(link.path) == 0:
@@ -333,8 +338,17 @@ class RouteVisualizerView(Gtk.DrawingArea):
             else:
                 link_path = link.transition_path
 
-            cr.set_source_rgba(link_color[0], link_color[1], link_color[2], link_color[3])
+            cr.set_line_width(4.0)
+            cr.set_line_cap(cairo.LINE_CAP_ROUND)
             cr.set_dash([], 0)
+
+            if self.selected_link == link:
+                cr.set_line_width(8.0)
+                cr.set_source_rgba(0.2, 0.2, 1.0, 1.0)
+                self.draw_link(cr, link_path)
+
+            cr.set_line_width(4.0)
+            cr.set_source_rgba(link_color[0], link_color[1], link_color[2], link_color[3])
 
             self.draw_link(cr, link_path)
 
