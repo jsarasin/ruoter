@@ -5,7 +5,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, GObject, GLib, Gdk, cairo
 
 import cairo
-from net.traceroute import TraceRouteNode, TraceRoute
 
 
 class NewTraceroutePing:
@@ -19,7 +18,7 @@ class NewTraceroutePing:
 
     def connect_builder_objects(self):
         builder = Gtk.Builder()
-        builder.add_from_file("gui/new_traceroute_ping.glade")
+        builder.add_from_file("snapins/new_traceroute_ping.glade")
 
         self.window = builder.get_object("window_traceroute_ping")
         self.combo_interface = builder.get_object("combo_interface")
@@ -27,8 +26,7 @@ class NewTraceroutePing:
         self.input_traceroute_freq = builder.get_object("input_traceroute_freq")
         self.input_ping_freq = builder.get_object("input_ping_freq")
         self.combo_traceroute_type = builder.get_object("combo_traceroute_type")
-        self.combo_traceroute_target_port = builder.get_object("combo_traceroute_target_port")
-        self.input_traceroute_target_port = builder.get_object("input_traceroute_target_port")
+        self.entry_traceroute_target_port = builder.get_object("entry_traceroute_target_port")
         self.combo_ping_type = builder.get_object("combo_ping_type")
         self.button_start = builder.get_object("button_start")
         self.button_cancel = builder.get_object("button_cancel")
@@ -54,7 +52,20 @@ class NewTraceroutePing:
         return False
 
     def close_selected(self, selected_id):
-        self.configuration['target_host'] = self.input_host.get_text()
+        # Apparently text returned from the following function requires manual freeing of the string?
+        self.configuration['iterface'] = self.combo_interface.get_active_text()
+
+        self.configuration['target'] = [self.input_host.get_text()]
+
+        self.configuration['tr_freq'] = self.input_traceroute_freq.get_text()
+
+        self.configuration['ping_freq'] = self.input_ping_freq.get_text()
+
+        self.configuration['traceroute_type'] = self.combo_traceroute_type.get_active_text()
+
+        self.configuration['traceroute_port'] = self.entry_traceroute_target_port.get_text()
+
+        self.configuration['ping_type'] = self.combo_ping_type.get_active_text()
 
         self.window.response(1)
         self.window.close()

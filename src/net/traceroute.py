@@ -1,63 +1,45 @@
-from random import randint
+# multiprocessing
 from scapy.all import *
+from multiprocessing import Process, Pipe
 import time
+from net.worker import worker
+from net.data import *
+import sys
+class Traceroute:
+    def __init__(self):
+        pipes = Pipe(True)
+        print(type(pipes))
+        self.parent_conn = pipes[0]
+        self.child_conn = pipes[1]
 
-class TraceRouteNode:
-    def __init__(self, ttl, ip):
-        self.ttl = ttl
-        if ip == "*":
-            self.ip = ip + str(ttl)
-        else:
-            self.ip = ip
+        self.p = Process(target=worker, args=(self.child_conn,))
+        self.p.start()
 
-    def resolve_hostname(self):
-        pass
+    def start(self, target):
+        message = [0,0,0]
+        message[0] = "TCPSYN"
+        message[1] = target
+        for ttl in range(0, 30):
+            message[2] = ttl
+            self.parent_conn.send(message)
+            print("send message")
 
-    def resolve_asn(self):
-        pass
+    def check(self):
+        sys.stdout.flush()
+        messages = []
 
-    def find_device_type(self):
-        pass
+        while(self.parent_conn.poll()):
+            print("a")
+            recv = self.parent_conn.recv()
+            if type(recv) == TracerouteHop:
+                messages.append(recv)
 
-
-class TraceRoute:
-    def __init__(self, target):
-        self.target = target
-        self.nodes = []
-        self.hops = []
-
-    def start_traceroute(self, target):
-        self.target = target
-        answers = []
-
-        for n in range(9):
-
-            ans, unans = sr(IP(dst=target, ttl=n,id=RandShort())/TCP(flags=0x2))
-            answers = answers + [ans]
-
-        # time.sleep(1)
+        return messages
 
 
-    def run_test(self):
-        def randomIP():
-            random_ip = ""
-            random_ip = random_ip + str(randint(1, 253)) + "."
-            random_ip = random_ip + str(randint(1, 253)) + "."
-            random_ip = random_ip + str(randint(1, 253)) + "."
-            random_ip = random_ip + str(randint(1, 253))
-            return random_ip
 
-        self.register_hop_response(0, "192.168.0.1")
-        for i in range(3):
-            self.register_hop_response(i+1, randomIP())
-        self.register_hop_response(i+2, self.target)
 
-        #
-        # self.nodes = self.nodes + [TraceRouteNode(0, "192.168.0.1")]
-        # for i in range(3):
-        #     self.nodes = self.nodes + [TraceRouteNode(i+1, randomIP())]
-        #
-        # self.nodes = self.nodes + [TraceRouteNode(i+2, self.target)]
-
-    def register_hop_response(self, ttl, ip):
-        self.nodes = self.nodes + [TraceRouteNode(ttl, ip)]
+    def __del__(self):
+        self.parent_conn.send("DIE")
+        self.p.join()
+        print("deleting")

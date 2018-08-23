@@ -65,6 +65,7 @@ class RouteVisualizerModel(Gtk.DrawingArea):
 
         return new_node
 
+
     def add_link(self, node_a, node_b, route_layer='default'):
         if type(node_a) is not RouteVisualizerNode or type(node_b) is not RouteVisualizerNode:
             print("Arguments must be direct node types")
@@ -76,7 +77,6 @@ class RouteVisualizerModel(Gtk.DrawingArea):
         self.links.append(new_link)
         node_a.update_link(new_link, node_b)
         node_b.update_link(new_link, node_a)
-
 
 class RouteVisualizerView(Gtk.DrawingArea):
     def __init__(self):
@@ -91,6 +91,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
         self.hover_over_link = None
         self.selected_link = None
         self.selected_nodes_count = 0
+        self.set_can_focus(True)
 
 
         self.last_time = time.time()
@@ -133,6 +134,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
         return False
 
     def mouse_button_press(self, widget, event):
+        self.grab_focus()
         self.mouse_down_x = event.x
         self.mouse_down_y = event.y
         self.button1_down = True
