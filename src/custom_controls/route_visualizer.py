@@ -363,6 +363,9 @@ class RouteVisualizerView(Gtk.DrawingArea):
 
 
     def draw_node(self, cr, node):
+        if not node.presented:
+            return
+
         if node.transition_amount is not None:
             if node.transition_amount != 1.0:
                 # cr.transform_point(-node.posx, -node.posy)
@@ -541,6 +544,7 @@ class RouteVisualizerView(Gtk.DrawingArea):
         assert(node not in self.transition_nodes)
 
         self.transition_nodes.append((node, time.time()))
+        node.presented = True
 
         self.calling_animation_enable = True
 

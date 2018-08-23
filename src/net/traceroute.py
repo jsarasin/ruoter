@@ -19,7 +19,7 @@ class Traceroute:
         message = [0,0,0]
         message[0] = "TCPSYN"
         message[1] = target
-        for ttl in range(0, 30):
+        for ttl in range(1, 20):
             message[2] = ttl
             self.parent_conn.send(message)
             print("send message")
