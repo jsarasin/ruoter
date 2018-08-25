@@ -84,66 +84,19 @@ class SnapInTraceroutePing(Snapin):
 
     @staticmethod
     def worker_tcpsyn(target, cttl):
-        # Explanation of result:
-        # the scapy function sr = send receive, this is blocking until it receives a response.
-        # The IP and TCP classes overload the / operator to encapsulate the right hand class in the left hand
-        # ans: list containing all the responses, we only sent one packet
-        # ans[0]: This is the entire response which is an Ethernet Frame & IP packet from local router containing
-        #         a ICMP response (Time to live exceeded) from the router at hop <ttl> which itself contains the
-        #         original request we sent out
-        # ans[0][1].src: The source IP of the TTL exceeded message
-        # ans[0][1][1].flags.S   Connected with target TCP Flag SYN is set
-        # >>> type(ans[0][1][1])   # TTL Exceeded
-        # <class 'scapy.layers.inet.ICMP'>
-        # >>> type(anst[0][1][1])  # TCP SYN response to our ACK
-        # <class 'scapy.layers.inet.TCP'>
-
-
-        TIMEOUT = 3
-        sent_time = time.time()
-        # ans, unans = sr(IP(dst=address, ttl=cttl, id=RandShort()) / TCP(flags=0x2), timeout=TIMEOUT, verbose=0)
-        ans, unans = sr(IP(dst="1.1.1.1", ttl=(4,25), id=RandShort()) / TCP(flags=0x2))
-
-        recv_time = time.time()
         result = dict()
+        sent_time = time.time()
+        ans, unans = sr(IP(dst=target, ttl=(cttl), id=RandShort()) / TCP(flags=0x2), timeout=1, verbose=False)
+        recv_time = time.time()
 
+        for snd, rcv in ans:
+            result['responding_host'] = rcv.src
+            result['rtt'] = recv_time - sent_time
+            result['ttl'] = snd.ttl
+            result['syn'] = False
 
-        if len(ans) == 1:
+        return result
 
-            # We received a TTL exceeded
-            if type(ans[0][1][1]) == scapy.layers.inet.ICMP:
-                # Should be certain, but we'll check just to make sure
-                if ans[0][1][1].type != 11:
-                    print("Thought we received a ICMP TTL exceeded but we didn't!")
-                    raise ValueError
-                    return None
-                result['responding_host'] = ans[0][1].src
-                result['rtt'] = recv_time - sent_time
-                result['ttl'] = cttl
-                result['syn'] = False
-                return result
-
-            # The destination hosted responded with a SYN to our TCP packet
-            if type(ans[0][1][1]) == scapy.layers.inet.TCP:
-                # This should be certain, but we'll check just to make sure
-                if not ans[0][1][1].flags.A:
-                    print("thought we got a ACK but we didnt!")
-                    raise ValueError
-                    return None
-                result['responding_host'] = ans[0][1].src
-                result['rtt'] = recv_time - sent_time
-                result['ttl'] = ttl
-                result['syn'] = True
-                return result
-
-        print("ans  :", ans, "#")
-        print("unans:", unans,"#")
-        return "TIMEOUT"
-
-
-        print("Unhandled Traceroute response")
-        raise ValueError
-        return "FUCK"
 
 
     @staticmethod

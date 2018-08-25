@@ -14,14 +14,6 @@ from gui.main_window import MainWindow
 
 from snapins.traceroute_ping import SnapInTraceroutePing
 from snapins.snapin import Snapin
-# from net.traceroute import Traceroute
-#
-# cat = Traceroute()
-# cat.start("1.1.1.1")
-#
-# while True:
-#     cat.check()
-
 
 def catfood(task_id, cat):
     if cat == "TIMEOUT":
@@ -30,20 +22,33 @@ def catfood(task_id, cat):
 
     print("Hop[%s] %s" % (cat['ttl'], cat['responding_host']))
 
+snappy = Snapin()
+for ttl in range(1, 21):
+    task_id = snappy.submit_task(catfood, SnapInTraceroutePing.worker_tcpsyn, ("1.1.1.1", ttl,))
 
-# snappy = Snapin()
-# for ttl in range(2, 3):
-#     task_id = snappy.submit_task(catfood, SnapInTraceroutePing.worker_tcpsyn, ("1.1.1.1", ttl,))
-#     # print("Started new task:", task_id)
+SnapInTraceroutePing.worker_pool[0].join()
 
-
+#
+#
 # Snapin.thread_handler.join()
+#
+# result = SnapInTraceroutePing.worker_tcpsyn("1.1.1.1", 9)
+# print(result)
+#
+# target = '1.1.1.1'
+# from scapy.all import *
+# ans, unans = sr(IP(dst=target, ttl=(4,15),id=RandShort())/TCP(flags=0x2), timeout=1)
+#
 
-#result = SnapInTraceroutePing.worker_tcpsyn("1.1.1.1", 9)
-#print(result)
 
-target = '1.1.1.1'
-from scapy.all import *
-import scapy.layers.inet
-ans, unans = sr(IP(dst=target, ttl=(4,15),id=RandShort())/TCP(flags=0x2), timeout=1)
 
+#
+#
+# from scapy.all import *
+# import scapy.layers.inet
+# target = "1.1.1.1"
+#
+# ans, unans = sr(IP(dst=target, ttl=(1,11),id=RandShort())/TCP(flags=0x2), timeout=1 )
+# for snd,rcv in ans:
+#     print(snd.ttl, rcv.src, isinstance(rcv.payload, TCP))
+#
