@@ -8,7 +8,7 @@ from custom_controls.route_visualizer import RouteVisualizerView, RouteVisualize
 import cairo
 
 # from net.traceroute import TraceRouteNode, TraceRoute
-from snapins.traceroute_ping import TraceroutePingSnapIn
+from snapins.traceroute_ping import SnapInTraceroutePing
 
 
 class MainWindow:
