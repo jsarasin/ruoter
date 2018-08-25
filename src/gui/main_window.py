@@ -66,7 +66,7 @@ class MainWindow:
         self.window.show_all()
 
     def add_new_traceroute_ping_children(self, configuration):
-        ntrp = TraceroutePingSnapIn(configuration)
+        ntrp = SnapInTraceroutePing(configuration)
         self.traceroute_ping_interfaces.append(ntrp)
 
         notebook_label = Gtk.Label(configuration['target'])
@@ -74,7 +74,7 @@ class MainWindow:
         self.notebook_tasks.set_current_page(new_page)
 
     def new_traceroute_ping(self, event):
-        config = TraceroutePingSnapIn.new_dialog(self.window)
+        config = SnapInTraceroutePing.new_dialog(self.window)
 
         if config is not None:
             self.add_new_traceroute_ping_children(config)

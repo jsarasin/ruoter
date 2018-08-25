@@ -45,7 +45,13 @@ class SnapinWorker:
 
             if THREADING_VERBOSE: print("dispatching new task")
             # Any other messages are treated as worker processes
-            worker_request_id, completion_callback, worker_function, data = message
+
+            # worker_pipe.send((Snapin.worker_request_id, completion_callback, worker_function, data,))
+
+            worker_request_id, completion_callback, selfy, worker_function, data = message
+            # completion_callback.__self__ = selfy
+            print("message: ", selfy)
+            sys.stdout.flush()
 
             result = worker_function(*data)
 
@@ -93,7 +99,9 @@ class Snapin:
             if THREADING_VERBOSE: print("sending new task")
             Snapin.worker_request_id = Snapin.worker_request_id  + 1
             worker_pipe = Snapin.get_free_worker_pipe()
-            worker_pipe.send((Snapin.worker_request_id, completion_callback, worker_function, data,))
+            print("Sending: ", completion_callback, " to worker")
+            sys.stdout.flush()
+            worker_pipe.send((Snapin.worker_request_id, completion_callback, str(completion_callback.__self__), worker_function, data,))
             return Snapin.worker_request_id
 
         return None
@@ -110,7 +118,8 @@ class Snapin:
                         data = worker.parent_pipe.recv()
                         worker_request_id, completion_callback, data = data
                         if THREADING_VERBOSE: print("    :", data, ":")
+                        sys.stdout.flush()
                         completion_callback(worker_request_id, data)
-            sleep(0.1)
+            sleep(0.15)
 
 

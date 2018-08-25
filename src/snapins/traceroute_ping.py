@@ -15,7 +15,7 @@ import scapy.layers.inet
 
 class SnapInTraceroutePing(Snapin):
     def __init__(self, configuration):
-        super.__init__()
+        Snapin.__init__(self)
         self.main_box = None
         self.visualizer_box = None
         self.visualizer = None
@@ -25,7 +25,7 @@ class SnapInTraceroutePing(Snapin):
         self.input_target_host = None
         self.configuration = configuration
 
-        self.initialize_control()
+        self.initialize_target_tab()
 
         self.highest_ttl_to_target = 0
 
@@ -34,16 +34,35 @@ class SnapInTraceroutePing(Snapin):
 
         self.initialize_target_tab()
 
-        GObject.timeout_add(2.0, self.check_traceroutes)
-        GObject.timeout_add(1.0, self.check_traceroutes)
+        # GObject.timeout_add(2.0, self.check_traceroutes)
+        self.start_traceroute("1.1.1.1")
         sys.stdout.flush()
 
-    def start_traceroute(self, address, completion_callback):
+    def start_traceroute(self, address):
+        print("I am", self)
+        sys.stdout.flush()
         for ttl in range(1, 20):
-            self.submit_task(SnapInTraceroutePing.worker_tcpsyn, ttl, SnapInTraceroutePing.worker_tcpsyn_complete_callback)
+            self.submit_task(self.worker_tcpsyn_complete_callback, SnapInTraceroutePing.worker_tcpsyn, ('1.1.1.1', ttl,))
 
-    def worker_tcpsyn_complete_callback(self, worker_data):
-        pass
+    def worker_tcpsyn_complete_callback(self, request_id, worker_data):
+        # result['responding_host'] = rcv.src
+        # result['rtt'] = recv_time - sent_time
+        # result['ttl'] = snd.ttl
+        # result['syn'] = False
+        new_node = self.route_model.add_node(worker_data['responding_host'])
+        ttl = worker_data['ttl']
+        new_node.posx = ttl * 200
+        new_node.pixbuf = None
+        new_node.presented = True
+
+        # self.input_target_host.set_text(worker_data['responding_host'])
+
+        # print("NEW:", worker_data)
+        sys.stdout.flush()
+
+
+        # self.update_route_model_from_traceroute()
+
 
     def update_route_model_from_traceroute(self):
         previous_node = None
@@ -102,7 +121,7 @@ class SnapInTraceroutePing(Snapin):
     @staticmethod
     def new_dialog(transient_parent):
         # Popup the new Traceroute Ping dialog and get a decision from the user
-        new_traceroute_ping_dialog = NewTraceroutePing(transient_parent)
+        new_traceroute_ping_dialog = DialogNewTraceroutePing(transient_parent)
         result = new_traceroute_ping_dialog.run()
 
         if result == -1:
