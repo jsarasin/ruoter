@@ -31,10 +31,19 @@ def catfood(task_id, cat):
     print("Hop[%s] %s" % (cat['ttl'], cat['responding_host']))
 
 
-snappy = Snapin()
-for ttl in range(8, 9):
-    task_id = snappy.submit_task(catfood, SnapInTraceroutePing.worker_tcpsyn, ("1.1.1.1", ttl,))
-    # print("Started new task:", task_id)
+# snappy = Snapin()
+# for ttl in range(2, 3):
+#     task_id = snappy.submit_task(catfood, SnapInTraceroutePing.worker_tcpsyn, ("1.1.1.1", ttl,))
+#     # print("Started new task:", task_id)
 
 
-Snapin.thread_handler.join()
+# Snapin.thread_handler.join()
+
+#result = SnapInTraceroutePing.worker_tcpsyn("1.1.1.1", 9)
+#print(result)
+
+target = '1.1.1.1'
+from scapy.all import *
+import scapy.layers.inet
+ans, unans = sr(IP(dst=target, ttl=(4,15),id=RandShort())/TCP(flags=0x2), timeout=1)
+

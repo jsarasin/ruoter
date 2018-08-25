@@ -83,20 +83,7 @@ class SnapInTraceroutePing(Snapin):
         self.visualizer.show()
 
     @staticmethod
-    def worker_tcpsyn(address, ttl):
-
-
-        TIMEOUT = 3
-        sent_time = time.time()
-        ans, unans = sr(IP(dst=address, ttl=ttl, id=RandShort()) / TCP(flags=0x2, seq=RandInt(),sport=RandShort(), dport=2000+ttl), timeout=TIMEOUT, verbose=0)
-
-        if ttl == 8:
-            print("\n\n8 unanswered:\n", unans[0], "\n\n")
-            sys.stdout.flush()
-
-        recv_time = time.time()
-        result = dict()
-
+    def worker_tcpsyn(target, cttl):
         # Explanation of result:
         # the scapy function sr = send receive, this is blocking until it receives a response.
         # The IP and TCP classes overload the / operator to encapsulate the right hand class in the left hand
@@ -111,7 +98,18 @@ class SnapInTraceroutePing(Snapin):
         # >>> type(anst[0][1][1])  # TCP SYN response to our ACK
         # <class 'scapy.layers.inet.TCP'>
 
+
+        TIMEOUT = 3
+        sent_time = time.time()
+        # ans, unans = sr(IP(dst=address, ttl=cttl, id=RandShort()) / TCP(flags=0x2), timeout=TIMEOUT, verbose=0)
+        ans, unans = sr(IP(dst="1.1.1.1", ttl=(4,25), id=RandShort()) / TCP(flags=0x2))
+
+        recv_time = time.time()
+        result = dict()
+
+
         if len(ans) == 1:
+
             # We received a TTL exceeded
             if type(ans[0][1][1]) == scapy.layers.inet.ICMP:
                 # Should be certain, but we'll check just to make sure
@@ -121,7 +119,7 @@ class SnapInTraceroutePing(Snapin):
                     return None
                 result['responding_host'] = ans[0][1].src
                 result['rtt'] = recv_time - sent_time
-                result['ttl'] = ttl
+                result['ttl'] = cttl
                 result['syn'] = False
                 return result
 
@@ -138,8 +136,10 @@ class SnapInTraceroutePing(Snapin):
                 result['syn'] = True
                 return result
 
-        if len(unans) == 1:
-            return "TIMEOUT"
+        print("ans  :", ans, "#")
+        print("unans:", unans,"#")
+        return "TIMEOUT"
+
 
         print("Unhandled Traceroute response")
         raise ValueError
