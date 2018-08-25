@@ -32,7 +32,7 @@ def catfood(task_id, cat):
 
 
 snappy = Snapin()
-for ttl in range(1, 20):
+for ttl in range(8, 9):
     task_id = snappy.submit_task(catfood, SnapInTraceroutePing.worker_tcpsyn, ("1.1.1.1", ttl,))
     # print("Started new task:", task_id)
 

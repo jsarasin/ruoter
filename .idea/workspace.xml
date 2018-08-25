@@ -2,16 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d21c28ba-aaac-44bf-a7cd-25687c9e143e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/snapins/snapin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/ruoter.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ruoter.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/main_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/main_window.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/net/data.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/net/traceroute.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/net/worker.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/snapins/new_traceroute_ping.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/snapins/traceroute_ping.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/snapins/traceroute_ping.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -24,7 +15,7 @@
     <session id="-2130579272">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="31" />
+          <entry key="project.closed" value="32" />
           <entry key="project.open.time.0" value="7" />
           <entry key="project.open.time.1" value="4" />
           <entry key="project.open.time.10" value="2" />
@@ -58,13 +49,13 @@
         <counts>
           <entry key="dummy" value="25" />
           <entry key="gitignore" value="13" />
-          <entry key="py" value="50943" />
+          <entry key="py" value="51101" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="38" />
-          <entry key="Python" value="50942" />
+          <entry key="Python" value="51100" />
           <entry key="Scratch" value="1" />
         </counts>
       </usages-collector>
@@ -74,7 +65,7 @@
     <favorites_list name="ruoter" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.27987117">
+    <splitter split-orientation="horizontal" split-proportion="0.5246377">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
@@ -92,8 +83,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/snapins/traceroute_ping.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="320">
-                  <caret line="88" column="21" lean-forward="true" selection-start-line="88" selection-start-column="21" selection-end-line="88" selection-end-column="21" />
+                <state relative-caret-position="270">
+                  <caret line="94" column="22" selection-start-line="94" selection-start-column="22" selection-end-line="94" selection-end-column="22" />
                   <folding>
                     <element signature="e#0#10#0" expanded="true" />
                   </folding>
@@ -161,20 +152,20 @@
         </leaf>
       </split-first>
       <split-second>
-        <splitter split-orientation="horizontal" split-proportion="0.47361046">
+        <splitter split-orientation="horizontal" split-proportion="0.3308311">
           <split-first>
             <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
               <file pinned="false" current-in-tab="true">
                 <entry file="file://$PROJECT_DIR$/src/snapins/snapin.py">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="270">
-                      <caret line="60" column="20" selection-start-line="60" selection-start-column="20" selection-end-line="60" selection-end-column="20" />
+                    <state relative-caret-position="144">
+                      <caret line="20" column="17" selection-start-line="20" selection-start-column="17" selection-end-line="20" selection-end-column="17" />
                       <folding>
                         <element signature="e#0#28#0" expanded="true" />
-                        <marker date="1535175481859" expanded="true" signature="150:1907" ph="..." />
-                        <marker date="1535175481859" expanded="true" signature="348:383" ph="..." />
-                        <marker date="1535175481859" expanded="true" signature="3544:3548" ph="..." />
-                        <marker date="1535175481859" expanded="true" signature="3624:3764" ph="..." />
+                        <marker date="1535175530412" expanded="true" signature="150:1866" ph="..." />
+                        <marker date="1535175530412" expanded="true" signature="348:383" ph="..." />
+                        <marker date="1535175530412" expanded="true" signature="3503:3507" ph="..." />
+                        <marker date="1535175530412" expanded="true" signature="3583:3723" ph="..." />
                       </folding>
                     </state>
                   </provider>
@@ -196,10 +187,10 @@
               <file pinned="false" current-in-tab="true">
                 <entry file="file://$PROJECT_DIR$/src/main.py">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="522">
-                      <caret line="29" selection-start-line="29" selection-end-line="29" />
+                    <state relative-caret-position="612">
+                      <caret line="34" column="21" selection-start-line="34" selection-start-column="21" selection-end-line="34" selection-end-column="21" />
                       <folding>
-                        <marker date="1535174633299" expanded="true" signature="514:623" ph="..." />
+                        <marker date="1535176950398" expanded="true" signature="514:622" ph="..." />
                       </folding>
                     </state>
                   </provider>
@@ -279,9 +270,9 @@
         <option value="$PROJECT_DIR$/src/custom_controls/route_visualizer.py" />
         <option value="$PROJECT_DIR$/src/net/traceroute.py" />
         <option value="$PROJECT_DIR$/src/gui/main_window.py" />
-        <option value="$PROJECT_DIR$/src/snapins/traceroute_ping.py" />
-        <option value="$PROJECT_DIR$/src/main.py" />
         <option value="$PROJECT_DIR$/src/snapins/snapin.py" />
+        <option value="$PROJECT_DIR$/src/main.py" />
+        <option value="$PROJECT_DIR$/src/snapins/traceroute_ping.py" />
       </list>
     </option>
   </component>
@@ -483,7 +474,7 @@
       <window_info id="Structure" order="2" sideWeight="0.49395972" weight="0.086778075" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3298639" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3418735" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.38751" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49973643" weight="0.30590716" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -681,16 +672,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="522">
-          <caret line="29" selection-start-line="29" selection-end-line="29" />
-          <folding>
-            <marker date="1535174633299" expanded="true" signature="514:623" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/local/lib/python3.5/dist-packages/scapy/sendrecv.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3120">
@@ -698,26 +679,36 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/snapins/traceroute_ping.py">
+    <entry file="file://$PROJECT_DIR$/src/snapins/snapin.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="88" column="21" lean-forward="true" selection-start-line="88" selection-start-column="21" selection-end-line="88" selection-end-column="21" />
+        <state relative-caret-position="144">
+          <caret line="20" column="17" selection-start-line="20" selection-start-column="17" selection-end-line="20" selection-end-column="17" />
           <folding>
-            <element signature="e#0#10#0" expanded="true" />
+            <element signature="e#0#28#0" expanded="true" />
+            <marker date="1535175530412" expanded="true" signature="150:1866" ph="..." />
+            <marker date="1535175530412" expanded="true" signature="348:383" ph="..." />
+            <marker date="1535175530412" expanded="true" signature="3503:3507" ph="..." />
+            <marker date="1535175530412" expanded="true" signature="3583:3723" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/snapins/snapin.py">
+    <entry file="file://$PROJECT_DIR$/src/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="612">
+          <caret line="34" column="21" selection-start-line="34" selection-start-column="21" selection-end-line="34" selection-end-column="21" />
+          <folding>
+            <marker date="1535176950398" expanded="true" signature="514:622" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/snapins/traceroute_ping.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
-          <caret line="60" column="20" selection-start-line="60" selection-start-column="20" selection-end-line="60" selection-end-column="20" />
+          <caret line="94" column="22" selection-start-line="94" selection-start-column="22" selection-end-line="94" selection-end-column="22" />
           <folding>
-            <element signature="e#0#28#0" expanded="true" />
-            <marker date="1535175481859" expanded="true" signature="150:1907" ph="..." />
-            <marker date="1535175481859" expanded="true" signature="348:383" ph="..." />
-            <marker date="1535175481859" expanded="true" signature="3544:3548" ph="..." />
-            <marker date="1535175481859" expanded="true" signature="3624:3764" ph="..." />
+            <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -84,9 +84,15 @@ class SnapInTraceroutePing(Snapin):
 
     @staticmethod
     def worker_tcpsyn(address, ttl):
+
+
         TIMEOUT = 3
         sent_time = time.time()
-        ans, unans = sr(IP(dst=address, ttl=ttl, id=RandShort()) / TCP(flags=0x2, seq=RandInt(),sport=RandShort(), dport=RandShort()), timeout=TIMEOUT, verbose=0)
+        ans, unans = sr(IP(dst=address, ttl=ttl, id=RandShort()) / TCP(flags=0x2, seq=RandInt(),sport=RandShort(), dport=2000+ttl), timeout=TIMEOUT, verbose=0)
+
+        if ttl == 8:
+            print("\n\n8 unanswered:\n", unans[0], "\n\n")
+            sys.stdout.flush()
 
         recv_time = time.time()
         result = dict()
@@ -104,8 +110,6 @@ class SnapInTraceroutePing(Snapin):
         # <class 'scapy.layers.inet.ICMP'>
         # >>> type(anst[0][1][1])  # TCP SYN response to our ACK
         # <class 'scapy.layers.inet.TCP'>
-
-        sys.stdout.flush()
 
         if len(ans) == 1:
             # We received a TTL exceeded
