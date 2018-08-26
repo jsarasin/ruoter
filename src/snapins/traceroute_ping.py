@@ -4,7 +4,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, GObject, GLib, Gdk, cairo
 from custom_controls.route_visualizer import RouteVisualizerView, RouteVisualizerModel
-
+import concurrent.futures
 
 from snapins.snapin import Snapin
 
@@ -24,6 +24,7 @@ class SnapInTraceroutePing(Snapin):
         self.trace_route = None
         self.input_target_host = None
         self.configuration = configuration
+        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
 
         self.initialize_target_tab()
 
@@ -37,48 +38,6 @@ class SnapInTraceroutePing(Snapin):
         # GObject.timeout_add(2.0, self.check_traceroutes)
         self.start_traceroute("1.1.1.1")
         sys.stdout.flush()
-
-    def start_traceroute(self, address):
-        print("I am", self)
-        sys.stdout.flush()
-        for ttl in range(1, 20):
-            self.submit_task(self.worker_tcpsyn_complete_callback, SnapInTraceroutePing.worker_tcpsyn, ('1.1.1.1', ttl,))
-
-    def worker_tcpsyn_complete_callback(self, request_id, worker_data):
-        # result['responding_host'] = rcv.src
-        # result['rtt'] = recv_time - sent_time
-        # result['ttl'] = snd.ttl
-        # result['syn'] = False
-        new_node = self.route_model.add_node(worker_data['responding_host'])
-        ttl = worker_data['ttl']
-        new_node.posx = ttl * 200
-        new_node.pixbuf = None
-        new_node.presented = True
-
-        # self.input_target_host.set_text(worker_data['responding_host'])
-
-        # print("NEW:", worker_data)
-        sys.stdout.flush()
-
-
-        # self.update_route_model_from_traceroute()
-
-
-    def update_route_model_from_traceroute(self):
-        previous_node = None
-        for tnode in self.trace_route.nodes:
-            # if tnode.ttl == 0 or tnode.ip == self.trace_route.target:
-            #     pixbuf = self.icon_computer
-            # else:
-            #     pixbuf = self.icon_router
-
-            node = self.route_model.add_node(tnode.ip)
-            node.pixbuf = None
-            node.presented = True
-
-            if previous_node is not None:
-                self.route_model.add_link(previous_node, node)
-            previous_node = node
 
     def initialize_target_tab(self):
         # This will populate whatever Gtk Box is passed to this function with all the controls required for this snapin
@@ -101,18 +60,61 @@ class SnapInTraceroutePing(Snapin):
         self.visualizer_box.add(self.visualizer)
         self.visualizer.show()
 
+    def start_traceroute(self, address):
+        # for cttl in range(1,20):
+        future = self.executor.submit(SnapInTraceroutePing.worker_tcpsyn, "1.1.1.1", 20)
+        future.add_done_callback(self.worker_tcpsyn_complete_callback)
+
+
+    def worker_tcpsyn_complete_callback(self, future):
+        worker_data = future.result()
+        # print("worker data:", worker_data)
+        # result['responding_host'] = rcv.src
+        # result['rtt'] = recv_time - sent_time
+        # result['ttl'] = snd.ttl
+        # result['syn'] = False
+        # ip = worker_data['responding_host']
+        ttl = worker_data['ttl']
+        worker_data['rtt'] = str(round(worker_data['rtt'] * 1000)) + "ms"
+
+        new_node = self.route_model.add_node("")
+        new_node.attributes.update(worker_data)
+        new_node.posx = ttl * 200
+        new_node.pixbuf = None
+        new_node.presented = True
+
+        sys.stdout.flush()
+
+
     @staticmethod
     def worker_tcpsyn(target, cttl):
         result = dict()
         sent_time = time.time()
-        ans, unans = sr(IP(dst=target, ttl=(cttl), id=RandShort()) / TCP(flags=0x2), timeout=1, verbose=False)
+        cork = 40000 + cttl
+        ans, unans = sr(IP(dst=target, ttl=(1, cttl), id=RandShort()) / ICMP(), verbose=False, timeout=3)
+        # ans, unans = sr(IP(dst=target, ttl=(cttl), id=RandShort()) / TCP(sport=cork, flags=0x2), timeout=10, verbose=False)
         recv_time = time.time()
 
-        for snd, rcv in ans:
-            result['responding_host'] = rcv.src
+        if len(ans) == 1:
+            send = ans[0][0]
+            recv = ans[0][1]
+            print("", ans[0])
+            print("*")
+            result['responding_host'] = recv.src
+            result['flags'] = recv[1].flags
             result['rtt'] = recv_time - sent_time
-            result['ttl'] = snd.ttl
+            result['ttl'] = send.ttl
             result['syn'] = False
+        if len(unans) == 1:
+            send = ans[0][0]
+            recv = ans[0][1]
+            result['ttl'] = send.ttl
+            result['name'] = "*"
+            print("*\n")
+
+        # for snd, rcv in ans:
+        #     print()
+        #     print()
 
         return result
 

@@ -26,8 +26,7 @@ from .route_visualizer_path import RouteVisualizerLinkPath
 class RouteVisualizerNode:
     def __init__(self, ip):
         self.ip = ip
-        self.hostname = None
-        self.asn = None
+        self.attributes = dict()
         self.posx = 0
         self.posy = 0
         self.selected = False
@@ -36,6 +35,12 @@ class RouteVisualizerNode:
         self.pixbuf = None
         self.transition_amount = None
         self.presented = False
+
+    def __setitem__(self, key, value):
+        self.attributes[key] = value
+
+    def __getitem__(self, item):
+        return self.attributes[item]
 
     def update_link(self, link, other_node):
         self.links[link] = other_node
@@ -434,6 +439,12 @@ class RouteVisualizerView(Gtk.DrawingArea):
         cr.set_source_rgba(0.0, 1.0, 1.0, 1.0)
         cr.show_text(node.ip)
         accumulator_y = accumulator_y + 15
+
+        for key, value in node.attributes.items():
+            cr.move_to(node.posx + 10 - HALF_WIDTH, node.posy - HALF_HEIGHT + accumulator_y + 15)
+            cr.set_source_rgba(0.0, 1.0, 1.0, 1.0)
+            cr.show_text(str(key) + ":" + str(value))
+            accumulator_y = accumulator_y + 15
 
         #
         # cr.move_to(node.posx + 10 - HALF_WIDTH, accumy + 15 - HALF_HEIGHT)
