@@ -69,7 +69,7 @@ class MainWindow:
         ntrp = SnapInTraceroutePing(configuration)
         self.traceroute_ping_interfaces.append(ntrp)
 
-        notebook_label = Gtk.Label(configuration['target'])
+        notebook_label = Gtk.Label(configuration['targets'])
         new_page = self.notebook_tasks.append_page(ntrp.main_box, notebook_label)
         self.notebook_tasks.set_current_page(new_page)
 

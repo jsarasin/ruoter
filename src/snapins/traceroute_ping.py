@@ -24,19 +24,21 @@ class SnapInTraceroutePing(Snapin):
         self.trace_route = None
         self.input_target_host = None
         self.configuration = configuration
+        self.configuration['targets'] = ["216.58.193.67", "1.1.1.1", "microsoft.com", "asdf.com","telus.net"]
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
-
+        self.last_y = 100
         self.initialize_target_tab()
 
         self.highest_ttl_to_target = 0
 
-        if len(configuration['target']) > 1:
+        if len(configuration['targets']) > 1:
             print("Only the first target will be tracerouted!")
 
         self.initialize_target_tab()
 
         # GObject.timeout_add(2.0, self.check_traceroutes)
-        self.start_traceroute("1.1.1.1")
+        self.hops = dict()
+        self.start_traceroute(self.configuration['targets']) #
         sys.stdout.flush()
 
     def initialize_target_tab(self):
@@ -48,7 +50,7 @@ class SnapInTraceroutePing(Snapin):
         self.visualizer_box = builder.get_object("visualizer_box")
         self.input_target_host = builder.get_object("input_target_host")
 
-        self.input_target_host.set_text('n'.join(self.configuration['target']))
+        self.input_target_host.set_text('n'.join(self.configuration['targets']))
 
         self.route_model = RouteVisualizerModel()
         self.route_model.new_node_position = [0, 0]
@@ -61,19 +63,48 @@ class SnapInTraceroutePing(Snapin):
         self.visualizer.show()
 
     def get_target_y(self, target):
-        return 100
+        for index, etarget in enumerate(self.configuration['targets']):
+            if target == etarget:
+                return (index * 200) + 100
+        return 500
+        # if 'y' not in self.targets[host]:
+        #     self.last_y += 200
+        #     self.hops[host]['y'] = self.last_y
+        # return self.hops[host]['y']
 
-    def start_traceroute(self, address):
+    def start_traceroute(self, addresses):
         for ttl in range(1,20):
-            future = self.executor.submit(SnapInTraceroutePing.worker_tcpsyn, "1.1.1.1", ttl)
-            future.add_done_callback(self.worker_tcpsyn_complete_callback)
+            for address in addresses:
+                future = self.executor.submit(SnapInTraceroutePing.worker_tcpsyn, address, ttl)
+                future.add_done_callback(self.worker_tcpsyn_complete_callback)
 
 
     def worker_tcpsyn_complete_callback(self, future):
         worker_data = future.result()
-        if worker_data:
-            # print(worker_data)
-            sys.stdout.flush()
+
+        if worker_data['unanswered'] == True:
+            host = "* -> " + worker_data['target']
+        else:
+            host = worker_data['host']
+
+        if host in self.hops:
+            print("hop has a second target: ", self.hops[host]['targets'], "adding:", worker_data['target'])
+            if worker_data['target'] not in self.hops[host]['targets']:
+                self.hops[host]['targets'].append(worker_data['target'])
+                self.hops[host]['node']['targets'] = self.hops[host]['targets']
+
+        else:
+            self.add_hop(worker_data)
+
+        print("\n"* 2)
+        sys.stdout.flush()
+
+
+    def add_hop(self, worker_data):
+        if worker_data['unanswered'] == True:
+            host = "* -> " + worker_data['target']
+        else:
+            host = worker_data['host']
 
         if 'ttl' in worker_data:
             ttl = worker_data['ttl']
@@ -81,22 +112,38 @@ class SnapInTraceroutePing(Snapin):
             ttl = 1
 
         if 'rtt' in worker_data:
-            worker_data['rtt'] = str(round(worker_data['rtt'] * 1000)) + "ms"
-
-        if worker_data['unanswered'] == True:
-            node_name = "*"
+            rtt = str(round(worker_data['rtt'] * 1000)) + "ms"
+            worker_data['rtt'] = rtt
         else:
-            node_name = worker_data['host']
+            rtt = None
 
+        target = worker_data['target']
 
-        new_node = self.route_model.add_node(node_name)
+        self.hops[host] = dict()
+
+        new_node = self.route_model.add_node(host)
         new_node.attributes.update(worker_data)
-        new_node.posx = ((ttl) * 200)-100
-        new_node.posy = self.get_target_y(worker_data['target'])
+        new_node.posx = ((ttl) * 200) - 100
+        new_node.posy = self.get_target_y(target)
         new_node.pixbuf = None
         new_node.presented = True
 
-        sys.stdout.flush()
+        self.hops[host]['raw'] = worker_data
+        self.hops[host]['ttl'] = ttl
+        self.hops[host]['rtt'] = rtt
+        self.hops[host]['node'] = new_node
+        self.hops[host]['targets'] = [target]
+
+        self.build_links(host, target, ttl, new_node)
+
+    def build_links(self, host, target, ttl, new_node):
+        last_hop = None
+        for key in self.hops:
+            if target in self.hops[key]['targets'] and (self.hops[key]['ttl'] == ttl - 1 or self.hops[key]['ttl'] == ttl + 1):
+                self.hops[host]['previous'] = self.hops[key]
+                self.hops[host]['previous_node'] = self.hops[key]['node']
+                self.route_model.add_link(self.hops[key]['node'], new_node)
+
 
 
     @staticmethod
@@ -214,7 +261,7 @@ class DialogNewTraceroutePing:
         # Apparently text returned from the following function requires manual freeing of the string?
         self.configuration['iterface'] = self.combo_interface.get_active_text()
 
-        self.configuration['target'] = [self.input_host.get_text()]
+        self.configuration['targets'] = [self.input_host.get_text()]
 
         self.configuration['tr_freq'] = self.input_traceroute_freq.get_text()
 

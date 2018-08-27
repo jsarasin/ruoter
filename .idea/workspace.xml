@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d21c28ba-aaac-44bf-a7cd-25687c9e143e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/main_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/main_window.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/snapins/traceroute_ping.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/snapins/traceroute_ping.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -15,7 +15,7 @@
     <session id="-2130579272">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="36" />
+          <entry key="project.closed" value="37" />
           <entry key="project.open.time.0" value="7" />
           <entry key="project.open.time.1" value="4" />
           <entry key="project.open.time.10" value="3" />
@@ -37,7 +37,7 @@
           <entry key="md" value="1" />
           <entry key="output" value="1" />
           <entry key="png" value="1" />
-          <entry key="py" value="126" />
+          <entry key="py" value="128" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
@@ -45,7 +45,7 @@
           <entry key="Image" value="1" />
           <entry key="Markdown" value="1" />
           <entry key="PLAIN_TEXT" value="2" />
-          <entry key="Python" value="123" />
+          <entry key="Python" value="125" />
           <entry key="Scratch" value="4" />
         </counts>
       </usages-collector>
@@ -53,13 +53,13 @@
         <counts>
           <entry key="dummy" value="25" />
           <entry key="gitignore" value="13" />
-          <entry key="py" value="54875" />
+          <entry key="py" value="56672" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="38" />
-          <entry key="Python" value="54874" />
+          <entry key="Python" value="56671" />
           <entry key="Scratch" value="1" />
         </counts>
       </usages-collector>
@@ -69,50 +69,32 @@
     <favorites_list name="ruoter" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.76647335">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/snapins/traceroute_ping.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="323">
-                  <caret line="93" column="41" selection-start-line="93" selection-start-column="41" selection-end-line="93" selection-end-column="41" />
-                  <folding>
-                    <element signature="e#0#10#0" expanded="true" />
-                    <marker date="1535356350364" expanded="true" signature="2085:2110" ph="..." />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/output">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="22">
-                  <caret line="1" column="20" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="20" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/main.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="242">
-                  <caret line="20" selection-start-line="20" selection-end-line="22" selection-end-column="28" />
-                  <folding>
-                    <marker date="1535355789188" expanded="true" signature="328:447" ph="..." />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/snapins/traceroute_ping.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="312">
+              <caret line="26" column="107" selection-start-line="26" selection-start-column="107" selection-end-line="26" selection-end-column="107" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+                <marker date="1535363111939" expanded="true" signature="2439:2448" ph="..." />
+                <marker date="1535363111939" expanded="true" signature="2439:2609" ph="..." />
+                <marker date="1535363111939" expanded="true" signature="4749:5125" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/output">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="440">
+              <caret line="20" selection-start-line="20" selection-end-line="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -123,9 +105,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>ICMP</find>
-      <find>request</find>
-      <find>flush</find>
       <find>Sending</find>
       <find>Sending new</find>
       <find>Pipe</find>
@@ -153,12 +132,16 @@
       <find>class IP(</find>
       <find>class UDP</find>
       <find>icmp</find>
+      <find>configuration['target']</find>
+      <find>:</find>
+      <find>$</find>
     </findStrings>
     <replaceStrings>
       <replace>NODE_HEIGHT</replace>
       <replace>DRAG_THRESHOLD</replace>
       <replace>self.node_b.posx</replace>
       <replace>SnapInTraceroutePing</replace>
+      <replace>configuration['targets']</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -407,7 +390,7 @@
       <window_info id="Structure" order="2" sideWeight="0.49395972" weight="0.086778075" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3298639" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3407173" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.29746836" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49973643" weight="0.32700422" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -551,6 +534,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="103">
           <caret line="68" selection-start-line="68" selection-end-line="68" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -595,16 +581,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="338">
-          <caret line="163" column="22" lean-forward="true" selection-start-line="163" selection-start-column="22" selection-end-line="163" selection-end-column="22" />
-          <folding>
-            <marker date="1535264815844" expanded="true" signature="976:1019" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/scapy/base_classes.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="216">
@@ -633,16 +609,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="20" selection-start-line="20" selection-end-line="22" selection-end-column="28" />
-          <folding>
-            <marker date="1535355789188" expanded="true" signature="328:447" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="288">
@@ -650,20 +616,42 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="404">
+          <caret line="48" selection-start-line="48" selection-end-line="48" />
+          <folding>
+            <marker date="1535264815844" expanded="true" signature="976:1019" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/output">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="22">
-          <caret line="1" column="20" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="20" />
+        <state relative-caret-position="440">
+          <caret line="20" selection-start-line="20" selection-end-line="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="418">
+          <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
+          <folding>
+            <marker date="1535355789188" expanded="true" signature="328:447" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/snapins/traceroute_ping.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="93" column="41" selection-start-line="93" selection-start-column="41" selection-end-line="93" selection-end-column="41" />
+        <state relative-caret-position="312">
+          <caret line="26" column="107" selection-start-line="26" selection-start-column="107" selection-end-line="26" selection-end-column="107" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1535356350364" expanded="true" signature="2085:2110" ph="..." />
+            <marker date="1535363111939" expanded="true" signature="2439:2448" ph="..." />
+            <marker date="1535363111939" expanded="true" signature="2439:2609" ph="..." />
+            <marker date="1535363111939" expanded="true" signature="4749:5125" ph="..." />
           </folding>
         </state>
       </provider>
