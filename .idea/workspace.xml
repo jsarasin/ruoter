@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d21c28ba-aaac-44bf-a7cd-25687c9e143e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/ruoter.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ruoter.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/snapins/traceroute_ping.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/snapins/traceroute_ping.py" afterDir="false" />
     </list>
@@ -38,8 +35,9 @@
           <entry key="gitignore" value="1" />
           <entry key="glade" value="1" />
           <entry key="md" value="1" />
+          <entry key="output" value="1" />
           <entry key="png" value="1" />
-          <entry key="py" value="112" />
+          <entry key="py" value="126" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
@@ -47,21 +45,21 @@
           <entry key="Image" value="1" />
           <entry key="Markdown" value="1" />
           <entry key="PLAIN_TEXT" value="2" />
-          <entry key="Python" value="110" />
-          <entry key="Scratch" value="2" />
+          <entry key="Python" value="123" />
+          <entry key="Scratch" value="4" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="25" />
           <entry key="gitignore" value="13" />
-          <entry key="py" value="53480" />
+          <entry key="py" value="54875" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="38" />
-          <entry key="Python" value="53479" />
+          <entry key="Python" value="54874" />
           <entry key="Scratch" value="1" />
         </counts>
       </usages-collector>
@@ -71,38 +69,27 @@
     <favorites_list name="ruoter" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.79283077">
+    <splitter split-orientation="horizontal" split-proportion="0.76647335">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/snapins/traceroute_ping.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="396">
-                  <caret line="108" lean-forward="true" selection-start-line="108" selection-end-line="108" />
+                <state relative-caret-position="323">
+                  <caret line="93" column="41" selection-start-line="93" selection-start-column="41" selection-end-line="93" selection-end-column="41" />
                   <folding>
                     <element signature="e#0#10#0" expanded="true" />
+                    <marker date="1535356350364" expanded="true" signature="2085:2110" ph="..." />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
           <file pinned="false" current-in-tab="false">
-            <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/scapy/plist.py">
+            <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/output">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1650">
-                  <caret line="88" selection-start-line="88" selection-end-line="88" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/custom_controls/route_visualizer.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="338">
-                  <caret line="163" column="22" lean-forward="true" selection-start-line="163" selection-start-column="22" selection-end-line="163" selection-end-column="22" />
-                  <folding>
-                    <marker date="1535264815844" expanded="true" signature="976:1019" ph="..." />
-                  </folding>
+                <state relative-caret-position="22">
+                  <caret line="1" column="20" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="20" />
                 </state>
               </provider>
             </entry>
@@ -114,10 +101,10 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="342">
-                  <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+                <state relative-caret-position="242">
+                  <caret line="20" selection-start-line="20" selection-end-line="22" selection-end-column="28" />
                   <folding>
-                    <marker date="1535328214592" expanded="true" signature="320:379" ph="..." />
+                    <marker date="1535355789188" expanded="true" signature="328:447" ph="..." />
                   </folding>
                 </state>
               </provider>
@@ -136,10 +123,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>self.links</find>
-      <find>hover_over_link</find>
-      <find>__</find>
-      <find>FlagVale</find>
       <find>ICMP</find>
       <find>request</find>
       <find>flush</find>
@@ -166,6 +149,10 @@
       <find>ttl=1</find>
       <find>frag=0 ttl=1</find>
       <find>frag=0 ttl=</find>
+      <find>class IP</find>
+      <find>class IP(</find>
+      <find>class UDP</find>
+      <find>icmp</find>
     </findStrings>
     <replaceStrings>
       <replace>NODE_HEIGHT</replace>
@@ -198,18 +185,19 @@
         <option value="$PROJECT_DIR$/src/snapins/snapin.py" />
         <option value="$PROJECT_DIR$/src/custom_controls/route_visualizer.py" />
         <option value="$PROJECT_DIR$/src/main.py" />
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/output" />
         <option value="$PROJECT_DIR$/src/snapins/traceroute_ping.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="y" value="32" />
-    <option name="width" value="1390" />
-    <option name="height" value="1002" />
+    <option name="y" value="30" />
+    <option name="width" value="1920" />
+    <option name="height" value="524" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
-      <autoscrollFromSource ProjectPane="true" />
+      <autoscrollFromSource Scope="true" ProjectPane="true" />
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
@@ -284,7 +272,7 @@
               <item name="ruoter" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
               <item name="" type="442cc68d:ScopeViewTreeModel$RootNode" />
               <item name="src" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="net" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+              <item name="snapins" type="9f88c78c:ScopeViewTreeModel$FileNode" />
             </path>
           </expand>
           <select />
@@ -419,7 +407,7 @@
       <window_info id="Structure" order="2" sideWeight="0.49395972" weight="0.086778075" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3298639" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.31751055" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3407173" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49973643" weight="0.32700422" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -434,20 +422,21 @@
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
     <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49798658" weight="0.08961518" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49798658" weight="0.15181866" />
       <window_info id="Favorites" order="1" sideWeight="0.5060403" side_tool="true" weight="0.24986821" />
       <window_info id="Structure" order="2" sideWeight="0.49395972" weight="0.086778075" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3298639" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.31329113" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49973643" weight="0.30590716" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.3407173" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49973643" weight="0.32700422" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.32911393" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32911393" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32911393" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.32911393" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5002636" side_tool="true" weight="0.37763712" />
-      <window_info anchor="bottom" id="Python Console" order="10" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32911393" />
+      <window_info anchor="bottom" id="Thumbnails" order="11" weight="0.32932693" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -477,7 +466,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/.PyCharmCE2018.2/system/python_stubs/-1247971763/math.py" />
     <entry file="file://$USER_HOME$/.PyCharmCE2018.2/system/python_stubs/-1247971763/builtins.py" />
     <entry file="file://$USER_HOME$/.PyCharmCE2018.2/system/python_stubs/-1247971763/cairo/_cairo/Context.py" />
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
@@ -513,7 +501,6 @@
     <entry file="file://$PROJECT_DIR$/src/.gitignore" />
     <entry file="file://$PROJECT_DIR$/src/python-traceroute.py" />
     <entry file="file://$USER_HOME$/.PyCharmCE2018.2/system/python_stubs/-1622149317/builtins.py" />
-    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/scapy/packet.py" />
     <entry file="file:///usr/lib/python3.6/selectors.py" />
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/python-skeletons/multiprocessing/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -548,15 +535,6 @@
     <entry file="file:///usr/local/lib/python3.5/dist-packages/scapy/plist.py" />
     <entry file="file://$PROJECT_DIR$/src/router.png">
       <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/scapy/sendrecv.py" />
-    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/scapy/layers/inet.py" />
-    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="16" column="23" lean-forward="true" selection-start-line="16" selection-start-column="23" selection-end-line="16" selection-end-column="23" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/snapins/new_traceroute_ping.glade">
       <provider selected="true" editor-type-id="text-editor">
@@ -593,10 +571,27 @@
     <entry file="file://$PROJECT_DIR$/src/snapins/snapin.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/scapy/layers/__init__.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/scapy/plist.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1650">
+        <state relative-caret-position="179">
           <caret line="88" selection-start-line="88" selection-end-line="88" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/scapy/fields.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="193">
+          <caret line="930" column="8" selection-start-line="930" selection-start-column="8" selection-end-line="930" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/scapy/sendrecv.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="311">
+          <caret line="167" column="3" selection-start-line="167" selection-start-column="3" selection-end-line="167" selection-end-column="3" />
         </state>
       </provider>
     </entry>
@@ -610,22 +605,65 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/scapy/base_classes.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="226" selection-start-line="226" selection-end-line="226" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/scapy/packet.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="169" selection-start-line="169" selection-end-line="169" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/lib/python3.6/concurrent/futures/_base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="383" selection-start-line="383" selection-end-line="383" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/scapy/layers/inet.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="639" column="17" selection-start-line="639" selection-start-column="17" selection-end-line="639" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+        <state relative-caret-position="242">
+          <caret line="20" selection-start-line="20" selection-end-line="22" selection-end-column="28" />
           <folding>
-            <marker date="1535328214592" expanded="true" signature="320:379" ph="..." />
+            <marker date="1535355789188" expanded="true" signature="328:447" ph="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="16" column="23" lean-forward="true" selection-start-line="16" selection-start-column="23" selection-end-line="16" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/output">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="22">
+          <caret line="1" column="20" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="20" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/snapins/traceroute_ping.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="396">
-          <caret line="108" lean-forward="true" selection-start-line="108" selection-end-line="108" />
+        <state relative-caret-position="323">
+          <caret line="93" column="41" selection-start-line="93" selection-start-column="41" selection-end-line="93" selection-end-column="41" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+            <marker date="1535356350364" expanded="true" signature="2085:2110" ph="..." />
           </folding>
         </state>
       </provider>

@@ -60,20 +60,21 @@ class SnapInTraceroutePing(Snapin):
         self.visualizer_box.add(self.visualizer)
         self.visualizer.show()
 
+    def get_target_y(self, target):
+        return 100
+
     def start_traceroute(self, address):
-        # for cttl in range(1,20):
-        future = self.executor.submit(SnapInTraceroutePing.worker_tcpsyn, "1.1.1.1", 20)
-        future.add_done_callback(self.worker_tcpsyn_complete_callback)
+        for ttl in range(1,20):
+            future = self.executor.submit(SnapInTraceroutePing.worker_tcpsyn, "1.1.1.1", ttl)
+            future.add_done_callback(self.worker_tcpsyn_complete_callback)
 
 
     def worker_tcpsyn_complete_callback(self, future):
         worker_data = future.result()
-        # print("worker data:", worker_data)
-        # result['responding_host'] = rcv.src
-        # result['rtt'] = recv_time - sent_time
-        # result['ttl'] = snd.ttl
-        # result['syn'] = False
-        # ip = worker_data['responding_host']
+        if worker_data:
+            # print(worker_data)
+            sys.stdout.flush()
+
         if 'ttl' in worker_data:
             ttl = worker_data['ttl']
         else:
@@ -82,11 +83,16 @@ class SnapInTraceroutePing(Snapin):
         if 'rtt' in worker_data:
             worker_data['rtt'] = str(round(worker_data['rtt'] * 1000)) + "ms"
 
+        if worker_data['unanswered'] == True:
+            node_name = "*"
+        else:
+            node_name = worker_data['host']
 
 
-        new_node = self.route_model.add_node("")
+        new_node = self.route_model.add_node(node_name)
         new_node.attributes.update(worker_data)
-        new_node.posx = ttl * 200
+        new_node.posx = ((ttl) * 200)-100
+        new_node.posy = self.get_target_y(worker_data['target'])
         new_node.pixbuf = None
         new_node.presented = True
 
@@ -97,39 +103,52 @@ class SnapInTraceroutePing(Snapin):
     def worker_tcpsyn(target, cttl):
         result = dict()
         sent_time = time.time()
-        cork = 40000 + (cttl * 30)
-        # ans, unans = sr(IP(dst=target, ttl=(1, cttl), id=RandShort()) / ICMP(), verbose=False, timeout=10)
-        ans, unans = sr(IP(dst=target, ttl=(cttl), id=RandShort()) / TCP(sport=cork, flags=0x2), timeout=10, verbose=False)
+        cork = 33434 + (cttl)
+
+        filter = ""
+        ddata = b"\x40\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50\x51\x52\x53\x54\x55\x56\x57\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
+        answered, unanswered_sent = sr(IP(dst=target, ttl=(cttl), id=RandShort()) / UDP(dport=cork) / Raw(ddata), verbose=False, timeout=10, filter=filter )
+
         recv_time = time.time()
+        rtt = recv_time - sent_time
 
-        # if len(ans) >= 1:
-        #     print("A:", ans)
-        # if len(unans) >= 1:
-        #     print("U:", ans)
+        result['target'] = target
+
+        if len(unanswered_sent):
+            result['ttl'] = unanswered_sent[0].ttl
+            result['unanswered'] = True
+            return result
+
+        answered_sent = answered[0][0]
+        answered_received = answered[0][1]
+
+        result['unanswered'] = False
+
+        if type(answered_received[1]) == scapy.layers.inet.ICMP:
+            result['response'] = "icmp/" + icmptypes[answered_received[1].type]
+            # ICMP TTL Exceeded
+            if answered_received[1].type == 11:
+                result['ttl'] = answered_sent.ttl
+                result['host'] = answered_received[0].src
+                result['rtt'] = rtt
+                return result
+            elif answered_received[1].type == 3:
+                assert(answered_received[1].code == 3)
+                result['ttl'] = answered_sent.ttl
+                result['host'] = answered_received[0].src
+                result['rtt'] = rtt
+                result['response'] = result['response'] + "/" + icmpcodes[answered_received[1].type][answered_received[1].code]
+                return result
+            else:
+                print("Unhandled ICMP response type:", answered_received[1].type)
+                return answered_received[1].summary()
+
+        if type(answered_received[1]) == scapy.layers.inet.TCP:
+            return answered_received.show()
 
 
-        if len(ans) == 1:
-            send = ans[0][0]
-            recv = ans[0][1]
-            # print("", ans[0])
-            # print("*")
-            result['responding_host'] = recv.src
-            result['flags'] = recv[1].flags
-            result['rtt'] = recv_time - sent_time
-            result['ttl'] = send.ttl
-            result['syn'] = False
-        if len(unans) == 1:
-            send = ans[0][0]
-            recv = ans[0][1]
-            result['ttl'] = send.ttl
-            result['name'] = "*"
-            # print("*\n")
 
-        # for snd, rcv in ans:
-        #     print()
-        #     print()
-
-        return result
+        return None
 
 
 
