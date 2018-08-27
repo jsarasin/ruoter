@@ -74,8 +74,15 @@ class SnapInTraceroutePing(Snapin):
         # result['ttl'] = snd.ttl
         # result['syn'] = False
         # ip = worker_data['responding_host']
-        ttl = worker_data['ttl']
-        worker_data['rtt'] = str(round(worker_data['rtt'] * 1000)) + "ms"
+        if 'ttl' in worker_data:
+            ttl = worker_data['ttl']
+        else:
+            ttl = 1
+
+        if 'rtt' in worker_data:
+            worker_data['rtt'] = str(round(worker_data['rtt'] * 1000)) + "ms"
+
+
 
         new_node = self.route_model.add_node("")
         new_node.attributes.update(worker_data)
@@ -90,16 +97,22 @@ class SnapInTraceroutePing(Snapin):
     def worker_tcpsyn(target, cttl):
         result = dict()
         sent_time = time.time()
-        cork = 40000 + cttl
-        ans, unans = sr(IP(dst=target, ttl=(1, cttl), id=RandShort()) / ICMP(), verbose=False, timeout=3)
-        # ans, unans = sr(IP(dst=target, ttl=(cttl), id=RandShort()) / TCP(sport=cork, flags=0x2), timeout=10, verbose=False)
+        cork = 40000 + (cttl * 30)
+        # ans, unans = sr(IP(dst=target, ttl=(1, cttl), id=RandShort()) / ICMP(), verbose=False, timeout=10)
+        ans, unans = sr(IP(dst=target, ttl=(cttl), id=RandShort()) / TCP(sport=cork, flags=0x2), timeout=10, verbose=False)
         recv_time = time.time()
+
+        # if len(ans) >= 1:
+        #     print("A:", ans)
+        # if len(unans) >= 1:
+        #     print("U:", ans)
+
 
         if len(ans) == 1:
             send = ans[0][0]
             recv = ans[0][1]
-            print("", ans[0])
-            print("*")
+            # print("", ans[0])
+            # print("*")
             result['responding_host'] = recv.src
             result['flags'] = recv[1].flags
             result['rtt'] = recv_time - sent_time
@@ -110,7 +123,7 @@ class SnapInTraceroutePing(Snapin):
             recv = ans[0][1]
             result['ttl'] = send.ttl
             result['name'] = "*"
-            print("*\n")
+            # print("*\n")
 
         # for snd, rcv in ans:
         #     print()
