@@ -17,8 +17,11 @@ class MainWindow:
         self.new_node = None
 
 
+        self.load_test()
         self.connect_builder_objects()
-        self.new_traceroute_ping(None)
+
+
+        #self.new_traceroute_ping(None)
 
         # User Interface elements
 
@@ -47,8 +50,18 @@ class MainWindow:
         # self.update_route_model_from_traceroute()
         # self.route_model.new_node_position = [75, 250]
 
+    def load_test(self):
+        builder = Gtk.Builder()
+        builder.add_from_file("test.glade")
 
+        window = builder.get_object("cat")
+        self.nar = builder.get_object("nar")
+        self.wedfdsdssfd = builder.get_object("wedfdsdssfd")
+        self.wedfdsdssfd.connect("clicked", self.showwe)
+        window.show_all()
 
+    def showwe(self, event):
+        self.nar.show()
 
 
     def connect_builder_objects(self):
