@@ -24,7 +24,7 @@ class SnapInTraceroutePing(Snapin):
         self.trace_route = None
         self.input_target_host = None
         self.configuration = configuration
-        self.configuration['targets'] = ["216.58.193.67", "1.1.1.1", "microsoft.com", "asdf.com","telus.net"]
+        # self.configuration['targets'] = ["216.58.193.67", "1.1.1.1", "microsoft.com", "asdf.com","telus.net"]
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
         self.last_y = 100
         self.initialize_target_tab()
@@ -217,7 +217,12 @@ class DialogNewTraceroutePing:
     def __init__(self, transient_for):
         self.connect_builder_objects()
         self.configuration = dict()
+        self.additional_targets = []
 
+        self.add_new_target("microsoft.com")
+        self.add_new_target("asdf.com")
+        self.add_new_target("shaw.ca")
+        self.add_new_target("1.1.1.1")
 
         self.window.set_transient_for(transient_for)
         self.window.show_all()
@@ -228,7 +233,7 @@ class DialogNewTraceroutePing:
 
         self.window = builder.get_object("window_traceroute_ping")
         self.combo_interface = builder.get_object("combo_interface")
-        self.input_host = builder.get_object("input_host")
+        self.input_target1 = builder.get_object("input_target1")
         self.input_traceroute_freq = builder.get_object("input_traceroute_freq")
         self.input_ping_freq = builder.get_object("input_ping_freq")
         self.combo_traceroute_type = builder.get_object("combo_traceroute_type")
@@ -236,10 +241,42 @@ class DialogNewTraceroutePing:
         self.combo_ping_type = builder.get_object("combo_ping_type")
         self.button_start = builder.get_object("button_start")
         self.button_cancel = builder.get_object("button_cancel")
+        self.button_add_target = builder.get_object("button_add_target")
+        self.box_target_list = builder.get_object("box_target_list")
+        self.image_remove = builder.get_object("image_remove")
 
         self.window.connect("delete-event", self.on_window_close)
         self.button_start.connect("clicked", self.start_ping)
-        self.button_cancel .connect("clicked", self.close_cancel)
+        self.button_cancel.connect("clicked", self.close_cancel)
+        self.button_add_target.connect("clicked", self.add_target_gui)
+
+    def add_target_gui(self, event):
+        self.add_new_target("")
+
+    def add_new_target(self, target):
+        new_box = Gtk.Box(Gtk.Orientation.HORIZONTAL, 3)
+        new_entry_target = Gtk.Entry()
+        new_entry_target.set_text(target)
+        new_button_image = Gtk.Image.new_from_stock("gtk-remove", -1)
+        new_button_delete = Gtk.Button()
+        new_button_delete.set_image(new_button_image)
+        new_button_delete.connect("clicked", self.button_click_remove_target)
+        new_box.pack_start(new_entry_target, True, True, 0)
+        new_box.pack_start(new_button_delete, False, True, 0)
+        self.box_target_list.pack_start(new_box, False, False, 0)
+        new_box.show_all()
+
+        self.additional_targets.append((new_box, new_entry_target, new_button_delete, new_button_image))
+
+    def button_click_remove_target(self, button):
+        parent_box = button.get_parent()
+        for index, box in enumerate(self.box_target_list.get_children()):
+            if parent_box == box:
+                break
+        del self.additional_targets[index-1]
+        self.box_target_list.remove(parent_box)
+        sys.stdout.flush()
+
 
     def run(self):
         self.window.show_all();
@@ -261,7 +298,11 @@ class DialogNewTraceroutePing:
         # Apparently text returned from the following function requires manual freeing of the string?
         self.configuration['iterface'] = self.combo_interface.get_active_text()
 
-        self.configuration['targets'] = [self.input_host.get_text()]
+        targets = [self.input_target1.get_text()]
+        for box, entry, button, image in self.additional_targets:
+            targets.append(entry.get_text())
+
+        self.configuration['targets'] = targets
 
         self.configuration['tr_freq'] = self.input_traceroute_freq.get_text()
 

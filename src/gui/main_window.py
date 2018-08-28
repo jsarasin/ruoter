@@ -18,6 +18,7 @@ class MainWindow:
 
 
         self.connect_builder_objects()
+        self.new_traceroute_ping(None)
 
         # User Interface elements
 

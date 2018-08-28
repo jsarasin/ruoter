@@ -2,12 +2,7 @@
 <!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.18"/>
-  <object class="GtkImage" id="image1">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-media-play</property>
-  </object>
-  <object class="GtkImage" id="image2">
+  <object class="GtkImage" id="image_add">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-add</property>
@@ -36,7 +31,6 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="image">image1</property>
                 <property name="always_show_image">True</property>
               </object>
               <packing>
@@ -102,6 +96,8 @@
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="margin_left">5</property>
+                        <property name="margin_right">10</property>
                         <property name="orientation">vertical</property>
                         <property name="spacing">5</property>
                         <child>
@@ -110,7 +106,6 @@
                             <property name="can_focus">False</property>
                             <property name="row_spacing">5</property>
                             <property name="column_spacing">5</property>
-                            <property name="row_homogeneous">True</property>
                             <property name="column_homogeneous">True</property>
                             <child>
                               <object class="GtkLabel">
@@ -143,6 +138,8 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="halign">end</property>
+                                <property name="valign">start</property>
+                                <property name="margin_top">5</property>
                                 <property name="label" translatable="yes">Target Host</property>
                               </object>
                               <packing>
@@ -199,35 +196,48 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkBox">
+                              <object class="GtkBox" id="box_target_list">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="orientation">vertical</property>
                                 <property name="spacing">5</property>
                                 <child>
-                                  <object class="GtkEntry" id="input_host">
+                                  <object class="GtkBox">
                                     <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="text" translatable="yes">google.ca</property>
-                                    <property name="input_hints">GTK_INPUT_HINT_NO_SPELLCHECK | GTK_INPUT_HINT_NONE</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">True</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkButton">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="receives_default">True</property>
-                                    <property name="image">image2</property>
-                                    <property name="always_show_image">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="spacing">3</property>
+                                    <child>
+                                      <object class="GtkEntry" id="input_target1">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="text" translatable="yes">duckduckgo.com</property>
+                                        <property name="input_hints">GTK_INPUT_HINT_NO_SPELLCHECK | GTK_INPUT_HINT_NONE</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">True</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkButton" id="button_add_target">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="image">image_add</property>
+                                        <property name="always_show_image">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
-                                    <property name="position">1</property>
+                                    <property name="position">0</property>
                                   </packing>
                                 </child>
                               </object>
@@ -290,7 +300,7 @@
                                         <property name="can_focus">False</property>
                                         <property name="active">0</property>
                                         <items>
-                                          <item translatable="yes">TCP SYN</item>
+                                          <item translatable="yes">UDP SYN + Data</item>
                                         </items>
                                       </object>
                                       <packing>
@@ -316,7 +326,6 @@
                                         <property name="can_focus">False</property>
                                         <property name="row_spacing">5</property>
                                         <property name="column_spacing">5</property>
-                                        <property name="row_homogeneous">True</property>
                                         <property name="column_homogeneous">True</property>
                                         <child>
                                           <object class="GtkLabel">
@@ -480,6 +489,16 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkImage" id="image_remove">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-remove</property>
+  </object>
+  <object class="GtkImage" id="image_start">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-media-play</property>
   </object>
   <object class="GtkTextBuffer" id="textbuffer1">
     <property name="text" translatable="yes">This type of route discovery will send out an IP PDUs with an increasing TTL with a TCP packet inside of that simply with the SYN flag set to a port of your choosing.</property>
