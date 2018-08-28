@@ -257,7 +257,7 @@ class DialogNewTraceroutePing:
         new_box = Gtk.Box(Gtk.Orientation.HORIZONTAL, 3)
         new_entry_target = Gtk.Entry()
         new_entry_target.set_text(target)
-        new_button_image = Gtk.Image.new_from_stock("gtk-remove", -1)
+        new_button_image = Gtk.Image.new_from_icon_name("gtk-remove",  Gtk.IconSize.BUTTON)
         new_button_delete = Gtk.Button()
         new_button_delete.set_image(new_button_image)
         new_button_delete.connect("clicked", self.button_click_remove_target)
