@@ -238,7 +238,6 @@ class DialogNewTraceroutePing:
         self.input_traceroute_freq = builder.get_object("input_traceroute_freq")
         self.input_ping_freq = builder.get_object("input_ping_freq")
         self.combo_traceroute_type = builder.get_object("combo_traceroute_type")
-        self.entry_traceroute_target_port = builder.get_object("entry_traceroute_target_port")
         self.combo_ping_type = builder.get_object("combo_ping_type")
         self.button_start = builder.get_object("button_start")
         self.button_cancel = builder.get_object("button_cancel")
@@ -310,8 +309,6 @@ class DialogNewTraceroutePing:
         self.configuration['ping_freq'] = self.input_ping_freq.get_text()
 
         self.configuration['traceroute_type'] = self.combo_traceroute_type.get_active_text()
-
-        self.configuration['traceroute_port'] = self.entry_traceroute_target_port.get_text()
 
         self.configuration['ping_type'] = self.combo_ping_type.get_active_text()
 
