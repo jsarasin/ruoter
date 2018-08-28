@@ -126,7 +126,8 @@ class SnapInTraceroutePing(Snapin):
         new_node.posx = ((ttl) * 200) - 100
         new_node.posy = self.get_target_y(target)
         new_node.pixbuf = None
-        new_node.presented = True
+        new_node.presented = False
+        self.visualizer.generate_node_animation(new_node)
 
         self.hops[host]['raw'] = worker_data
         self.hops[host]['ttl'] = ttl

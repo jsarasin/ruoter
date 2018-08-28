@@ -7,11 +7,13 @@
     <property name="can_focus">False</property>
     <property name="stock">gtk-add</property>
   </object>
-  <object class="GtkDialog" id="window_traceroute_ping">
-    <property name="width_request">585</property>
-    <property name="height_request">479</property>
+  <object class="GtkImage" id="image_start">
+    <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">New Traceroute Ping</property>
+    <property name="stock">gtk-media-play</property>
+  </object>
+  <object class="GtkDialog" id="window_traceroute_ping">
+    <property name="can_focus">False</property>
     <property name="type_hint">dialog</property>
     <child>
       <placeholder/>
@@ -31,6 +33,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="image">image_start</property>
                 <property name="always_show_image">True</property>
               </object>
               <packing>
@@ -63,8 +66,6 @@
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">5</property>
-            <property name="margin_right">5</property>
             <property name="orientation">vertical</property>
             <property name="spacing">5</property>
             <child>
@@ -96,8 +97,6 @@
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="margin_left">5</property>
-                        <property name="margin_right">10</property>
                         <property name="orientation">vertical</property>
                         <property name="spacing">5</property>
                         <child>
@@ -362,7 +361,7 @@
                                               <item translatable="yes">Auto</item>
                                             </items>
                                             <child internal-child="entry">
-                                              <object class="GtkEntry" id="entry_traceroute_target_port">
+                                              <object class="GtkEntry">
                                                 <property name="can_focus">True</property>
                                                 <property name="input_purpose">number</property>
                                               </object>
@@ -489,18 +488,5 @@
         </child>
       </object>
     </child>
-  </object>
-  <object class="GtkImage" id="image_remove">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-remove</property>
-  </object>
-  <object class="GtkImage" id="image_start">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-media-play</property>
-  </object>
-  <object class="GtkTextBuffer" id="textbuffer1">
-    <property name="text" translatable="yes">This type of route discovery will send out an IP PDUs with an increasing TTL with a TCP packet inside of that simply with the SYN flag set to a port of your choosing.</property>
   </object>
 </interface>
