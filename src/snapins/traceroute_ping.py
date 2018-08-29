@@ -2,7 +2,7 @@ import sys
 import os
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, GObject, GLib, Gdk, cairo
+from gi.repository import Gtk, GdkPixbuf, GObject, GLib, Gdk, cairo, Gio
 from custom_controls.route_visualizer import RouteVisualizerView, RouteVisualizerModel
 import concurrent.futures
 
@@ -27,7 +27,7 @@ class SnapInTraceroutePing(Snapin):
         self.input_target_host = None
         self.configuration = configuration
         # self.configuration['targets'] = ["216.58.193.67", "1.1.1.1", "microsoft.com", "asdf.com","telus.net"]
-        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
+        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=15)
         self.last_y = 100
         self.initialize_target_tab()
 
@@ -40,7 +40,8 @@ class SnapInTraceroutePing(Snapin):
 
         # GObject.timeout_add(2.0, self.check_traceroutes)
         self.hops = dict()
-        self.start_traceroute(self.configuration['targets']) #
+        if self.configuration['start_immediately']:
+            self.start_traceroute(self.configuration['targets']) #
         sys.stdout.flush()
 
     def initialize_target_tab(self):
@@ -50,9 +51,21 @@ class SnapInTraceroutePing(Snapin):
 
         self.main_box = builder.get_object("traceroute_ping")
         self.visualizer_box = builder.get_object("visualizer_box")
-        self.input_target_host = builder.get_object("input_target_host")
+        self.button_targets = builder.get_object("button_targets")
+        self.button_targets.connect("clicked", self.show_targets_popover)
+        self.popover_targets = builder.get_object("popover_targets")
 
-        self.input_target_host.set_text('n'.join(self.configuration['targets']))
+        self.revealer_detailed_info = builder.get_object("revealer_detailed_info")
+        self.togglebutton_details = builder.get_object("togglebutton_details")
+        self.togglebutton_details.connect("toggled", self.togglebutton_details_clicked)
+
+        self.treeview_targets = builder.get_object("treeview_targets")
+        self.treestore_targets = Gtk.TreeStore(str)
+        cell_renderer = Gtk.CellRendererText()
+        column_id = Gtk.TreeViewColumn("Hostname", cell_renderer, text=0)
+        column_id.set_visible(True)
+        self.treeview_targets.append_column(column_id)
+        self.treeview_targets.set_model(self.treestore_targets)
 
         self.route_model = RouteVisualizerModel()
         self.route_model.new_node_position = [0, 0]
@@ -63,6 +76,15 @@ class SnapInTraceroutePing(Snapin):
         self.visualizer.set_vexpand(True)
         self.visualizer_box.add(self.visualizer)
         self.visualizer.show()
+
+        self.entry_average_ping = builder.get_object("entry_average_ping")
+
+    def togglebutton_details_clicked(self, button):
+        self.revealer_detailed_info.set_reveal_child(self.togglebutton_details.get_active())
+
+
+    def show_targets_popover(self, button):
+        self.popover_targets.show()
 
     def get_target_y(self, target):
         for index, etarget in enumerate(self.configuration['targets']):
@@ -77,6 +99,7 @@ class SnapInTraceroutePing(Snapin):
     def start_traceroute(self, addresses):
         for ttl in range(1,20):
             for address in addresses:
+                if ttl == 1: self.treestore_targets.append(None, [address])
                 future = self.executor.submit(SnapInTraceroutePing.worker_tcpsyn, address, ttl)
                 future.add_done_callback(self.worker_tcpsyn_complete_callback)
 
@@ -90,7 +113,6 @@ class SnapInTraceroutePing(Snapin):
             host = worker_data['host']
 
         if host in self.hops:
-            print("hop has a second target: ", self.hops[host]['targets'], "adding:", worker_data['target'])
             if worker_data['target'] not in self.hops[host]['targets']:
                 self.hops[host]['targets'].append(worker_data['target'])
                 self.hops[host]['node']['targets'] = self.hops[host]['targets']
@@ -98,7 +120,6 @@ class SnapInTraceroutePing(Snapin):
         else:
             self.add_hop(worker_data)
 
-        print("\n"* 2)
         sys.stdout.flush()
 
 
@@ -246,6 +267,7 @@ class DialogNewTraceroutePing:
         self.button_add_target = builder.get_object("button_add_target")
         self.box_target_list = builder.get_object("box_target_list")
         self.image_remove = builder.get_object("image_remove")
+        self.switch_start_immediately = builder.get_object("switch_start_immediately")
 
         self.window.connect("delete-event", self.on_window_close)
         self.button_start.connect("clicked", self.start_ping)
@@ -259,6 +281,7 @@ class DialogNewTraceroutePing:
         new_box = Gtk.Box(Gtk.Orientation.HORIZONTAL, 3)
         new_entry_target = Gtk.Entry()
         new_entry_target.set_text(target)
+        new_entry_target.set_activates_default(True)
         new_button_image = Gtk.Image.new_from_icon_name("gtk-remove",  Gtk.IconSize.BUTTON)
         new_button_delete = Gtk.Button()
         new_button_delete.set_image(new_button_image)
@@ -313,6 +336,8 @@ class DialogNewTraceroutePing:
         self.configuration['traceroute_type'] = self.combo_traceroute_type.get_active_text()
 
         self.configuration['ping_type'] = self.combo_ping_type.get_active_text()
+
+        self.configuration['start_immediately'] = self.switch_start_immediately.get_state()
 
         self.window.response(1)
         self.window.close()

@@ -3,7 +3,7 @@ import gi
 from random import randint
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, GObject, GLib, Gdk, cairo
+from gi.repository import Gtk, GdkPixbuf, GObject, GLib, Gdk, cairo, Gio
 from custom_controls.route_visualizer import RouteVisualizerView, RouteVisualizerModel
 import cairo
 
@@ -68,8 +68,7 @@ class MainWindow:
     def add_new_traceroute_ping_children(self, configuration):
         ntrp = SnapInTraceroutePing(configuration)
         self.traceroute_ping_interfaces.append(ntrp)
-
-        notebook_label = Gtk.Label(configuration['targets'])
+        notebook_label = Gtk.Label("Traceroute Ping")
         new_page = self.notebook_tasks.append_page(ntrp.main_box, notebook_label)
         self.notebook_tasks.set_current_page(new_page)
 

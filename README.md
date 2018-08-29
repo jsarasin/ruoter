@@ -34,8 +34,10 @@ Python 3.4. All the defaults are fine.
 4. Install Scapy using the Python package installation utility PIP. If you added 
 Python to your path then you should be able to run this anywhere, otherwise 
 you'll have to navigate to where pip is installed.
-`C:\ pip3 install scapy`
+`C:\>pip3 install scapy`
 
 #### Running
+Be patient on the first run. :P
+
 `C:\ruoter\src>python main.py`
 
