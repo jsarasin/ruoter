@@ -12,6 +12,9 @@ Other requirements are typically preinstalled.
 - GTK 3.18 or higher.
 - Python 3.4
 
+#### Running
+Currently requires sudo. Might be possible to have the program use the wheel
+group as it's dependent on libpcap. Maybe not though.
 
 ### Windows
 - WinPCap. Bundled with [Wireshark](https://www.wireshark.org "Go Deep.")
@@ -30,4 +33,7 @@ Python 3.4. All the defaults are fine.
 Python to your path then you should be able to run this anywhere, otherwise 
 you'll have to navigate to where pip is installed.
 `C:\ pip3 install scapy`
+
+#### Running
+`C:\ruoter\src>python main.py`
 
