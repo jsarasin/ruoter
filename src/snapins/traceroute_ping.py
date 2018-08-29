@@ -243,10 +243,10 @@ class DialogNewTraceroutePing:
         self.configuration = dict()
         self.additional_targets = []
 
+        self.add_new_target("1.1.1.1")
         self.add_new_target("microsoft.com")
         self.add_new_target("asdf.com")
         self.add_new_target("shaw.ca")
-        self.add_new_target("1.1.1.1")
 
         self.window.set_transient_for(transient_for)
         self.window.show_all()

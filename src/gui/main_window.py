@@ -57,10 +57,11 @@ class MainWindow:
         self.window = builder.get_object("main_window")
         self.notebook_tasks = builder.get_object("notebook_tasks")
         self.button_welcome_new_traceroute_ping = builder.get_object("button_welcome_new_traceroute_ping")
+        self.menu_new_traceroute_ping = builder.get_object("menu_new_traceroute_ping")
 
         self.button_welcome_new_traceroute_ping.connect("clicked", self.new_traceroute_ping)
 
-
+        self.menu_new_traceroute_ping.connect("activate", self.new_traceroute_ping)
         self.window.connect("delete-event", Gtk.main_quit)
 
         self.window.show_all()
