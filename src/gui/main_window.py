@@ -9,7 +9,7 @@ import cairo
 
 # from net.traceroute import TraceRouteNode, TraceRoute
 from snapins.traceroute_ping import SnapInTraceroutePing
-
+from get_root_path import get_root_path
 
 class MainWindow:
     def __init__(self):
@@ -52,7 +52,7 @@ class MainWindow:
 
     def connect_builder_objects(self):
         builder = Gtk.Builder()
-        builder.add_from_file("gui/main.glade")
+        builder.add_from_file(get_root_path() + "gui/main.glade")
 
         self.window = builder.get_object("main_window")
         self.notebook_tasks = builder.get_object("notebook_tasks")

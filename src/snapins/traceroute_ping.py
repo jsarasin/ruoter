@@ -10,6 +10,8 @@ from snapins.snapin import Snapin
 
 from scapy.all import *
 
+from get_root_path import get_root_path
+
 import scapy.layers.inet
 
 
@@ -44,7 +46,7 @@ class SnapInTraceroutePing(Snapin):
     def initialize_target_tab(self):
         # This will populate whatever Gtk Box is passed to this function with all the controls required for this snapin
         builder = Gtk.Builder()
-        builder.add_from_file("snapins/traceroute_ping.glade")
+        builder.add_from_file(get_root_path() + "snapins/traceroute_ping.glade")
 
         self.main_box = builder.get_object("traceroute_ping")
         self.visualizer_box = builder.get_object("visualizer_box")
@@ -230,7 +232,7 @@ class DialogNewTraceroutePing:
 
     def connect_builder_objects(self):
         builder = Gtk.Builder()
-        builder.add_from_file("snapins/new_traceroute_ping2.glade")
+        builder.add_from_file(get_root_path() + "snapins/new_traceroute_ping2.glade")
 
         self.window = builder.get_object("window_traceroute_ping")
         self.combo_interface = builder.get_object("combo_interface")
