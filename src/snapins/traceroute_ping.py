@@ -230,7 +230,7 @@ class DialogNewTraceroutePing:
 
     def connect_builder_objects(self):
         builder = Gtk.Builder()
-        builder.add_from_file("snapins/new_traceroute_ping.glade")
+        builder.add_from_file("snapins/new_traceroute_ping2.glade")
 
         self.window = builder.get_object("window_traceroute_ping")
         self.combo_interface = builder.get_object("combo_interface")
