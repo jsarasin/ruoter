@@ -1,6 +1,8 @@
 # ruoter
 Route Analyser - Traceroute visualization and more!
 
+![Screenshot of Ruoter](/../screenshots/ruoter.png?raw=true "Shameless screenshot")
+
 ## Installation
 
 ### Linux Debian Based
