@@ -15,6 +15,48 @@ from get_root_path import get_root_path
 import scapy.layers.inet
 
 
+class ResponseType:
+    TIMEOUT = 0
+    ICMP_TTL_EXCEEDED = 1
+    ICMP_PORT_UNREACH = 2
+
+class RequestType:
+    UDP_SYN = 0 # First traceroute discovery. There will be multiple of these sent out at the same time.
+    TCP_SYN_SEQUENTIAL = 1     # Fallback, initialize connection to tcp/80
+    ICMP_ECHO = 2   # Vanilla Echo
+
+
+class MultiTraceroute:
+    def __init__(self, targets):
+        self.requests = {}
+
+
+    def register_request(self, request_type, ip_id, target, ttl):
+        if ip_id in self.requests:
+            print("Registered a second request for the same ip.id")
+            return
+
+        self.requests[ip_id] = (request_type, target, ttl)
+
+    def register_response(self, response):
+        request = self.requests[response['request_id']]
+
+        if response['type'] == ResponseType.TIMEOUT:
+            assert(request[1] == response['target'])
+            assert(request[2] == response['ttl'])
+
+        if response['type'] == ResponseType.ICMP_PORT_UNREACH:
+            assert(request[1] == response['target'])
+            assert(request[2] == response['ttl'])
+
+        if response['type'] == ResponseType.ICMP_TTL_EXCEEDED:
+            assert(request[1] == response['target'])
+            assert(request[2] == response['ttl'])
+
+    # cat = getaddrinfo("microsoft.com", None, AddressFamily.AF_INET, SocketKind.SOCK_STREAM)
+
+
+
 class SnapInTraceroutePing(Snapin):
     def __init__(self, configuration):
         Snapin.__init__(self)
@@ -26,10 +68,10 @@ class SnapInTraceroutePing(Snapin):
         self.trace_route = None
         self.input_target_host = None
         self.configuration = configuration
-        # self.configuration['targets'] = ["216.58.193.67", "1.1.1.1", "microsoft.com", "asdf.com","telus.net"]
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=15)
         self.last_y = 100
         self.initialize_target_tab()
+        self.host_tracker = MultiTraceroute()
 
         self.highest_ttl_to_target = 0
 
@@ -38,7 +80,7 @@ class SnapInTraceroutePing(Snapin):
 
         self.initialize_target_tab()
 
-        # GObject.timeout_add(2.0, self.check_traceroutes)
+
         self.hops = dict()
         if self.configuration['start_immediately']:
             self.start_traceroute(self.configuration['targets']) #
@@ -65,6 +107,9 @@ class SnapInTraceroutePing(Snapin):
         column_id = Gtk.TreeViewColumn("Hostname", cell_renderer, text=0)
         column_id.set_visible(True)
         self.treeview_targets.append_column(column_id)
+        # Setup targets Popup treestore
+        for address in self.configuration['targets']:
+            self.treestore_targets.append(None, [address])
         self.treeview_targets.set_model(self.treestore_targets)
 
         self.route_model = RouteVisualizerModel()
@@ -91,40 +136,27 @@ class SnapInTraceroutePing(Snapin):
             if target == etarget:
                 return (index * 200) + 100
         return 500
-        # if 'y' not in self.targets[host]:
-        #     self.last_y += 200
-        #     self.hops[host]['y'] = self.last_y
-        # return self.hops[host]['y']
 
     def start_traceroute(self, addresses):
+        custom_id = random.randint(1000, 20000)
+
         for ttl in range(1,20):
+            custom_id = custom_id + 1
             for address in addresses:
-                if ttl == 1: self.treestore_targets.append(None, [address])
-                future = self.executor.submit(SnapInTraceroutePing.worker_tcpsyn, address, ttl)
+                custom_id = custom_id + 1
+                future = self.executor.submit(SnapInTraceroutePing.worker_tcpsyn, address, ttl, custom_id)
                 future.add_done_callback(self.worker_tcpsyn_complete_callback)
+                self.host_tracker.register_request(RequestType.UDP_SYN, custom_id, target, ttl)
 
 
     def worker_tcpsyn_complete_callback(self, future):
-        worker_data = future.result()
+        response = future.result()
 
-        if worker_data['unanswered'] == True:
-            host = "* -> " + worker_data['target']
-        else:
-            host = worker_data['host']
-
-        if host in self.hops:
-            if worker_data['target'] not in self.hops[host]['targets']:
-                self.hops[host]['targets'].append(worker_data['target'])
-                self.hops[host]['node']['targets'] = self.hops[host]['targets']
-
-        else:
-            self.add_hop(worker_data)
-
-        sys.stdout.flush()
+        self.host_tracker.register_response(response)
 
 
-    def add_hop(self, worker_data):
-        if worker_data['unanswered'] == True:
+    def register_hop(self, worker_data):
+        if worker_data['unanswered']:
             host = "* -> " + worker_data['target']
         else:
             host = worker_data['host']
@@ -168,57 +200,61 @@ class SnapInTraceroutePing(Snapin):
                 self.hops[host]['previous_node'] = self.hops[key]['node']
                 self.route_model.add_link(self.hops[key]['node'], new_node)
 
-
-
     @staticmethod
-    def worker_tcpsyn(target, cttl):
-        result = dict()
+    def worker_tcpsyn(target, cttl, custom_id, include_raw=False):
+        response = dict()
         sent_time = time.time()
         cork = 33434 + (cttl)
 
-        filter = ""
+        myfilter = ""
         ddata = b"\x40\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50\x51\x52\x53\x54\x55\x56\x57\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
-        answered, unanswered_sent = sr(IP(dst=target, ttl=(cttl), id=RandShort()) / UDP(dport=cork) / Raw(ddata), verbose=False, timeout=10, filter=filter )
+        answered, unanswered_sent = sr(IP(dst=target, ttl=(cttl), id=custom_id) / UDP(dport=cork) / Raw(ddata), verbose=False, timeout=10, filter=myfilter )
 
         recv_time = time.time()
         rtt = recv_time - sent_time
 
-        result['target'] = target
 
         if len(unanswered_sent):
-            result['ttl'] = unanswered_sent[0].ttl
-            result['unanswered'] = True
-            return result
+            response['target'] = target
+            response['ttl'] = unanswered_sent[0].ttl
+            response['type'] = ResponseType.TIMEOUT
+            if include_raw:
+                response['raw_sent'] = unanswered_sent
+                response['raw_recv'] = None
+            return response
 
         answered_sent = answered[0][0]
         answered_received = answered[0][1]
 
-        result['unanswered'] = False
+        if include_raw:
+            response['raw_sent'] = answered_sent
+            response['raw_recv'] = answered_received
 
         if type(answered_received[1]) == scapy.layers.inet.ICMP:
-            result['response'] = "icmp/" + icmptypes[answered_received[1].type]
-            # ICMP TTL Exceeded
             if answered_received[1].type == 11:
-                result['ttl'] = answered_sent.ttl
-                result['host'] = answered_received[0].src
-                result['rtt'] = rtt
-                return result
+                # ICMP TTL Exceeded
+                response['target'] = target
+                response['ttl'] = answered_received[2].ttl # answered_sent.ttl
+                response['host'] = answered_received[0].src
+                response['rtt'] = rtt
+                response['request_id'] = answered_received[2].id
+                response['type'] = ResponseType.ICMP_TTL_EXCEEDED
+                return response
             elif answered_received[1].type == 3:
+                # ICMP Destination Unreachable/Port Unreachable
                 assert(answered_received[1].code == 3)
-                result['ttl'] = answered_sent.ttl
-                result['host'] = answered_received[0].src
-                result['rtt'] = rtt
-                result['response'] = result['response'] + "/" + icmpcodes[answered_received[1].type][answered_received[1].code]
-                return result
+                response['target'] = target
+                response['ttl'] = answered_received[2].ttl # answered_sent.ttl
+                response['host'] = answered_received[0].src
+                response['rtt'] = rtt
+                response['request_id'] = answered_received[2].id
+                response['type'] = ResponseType.ICMP_PORT_UNREACH
+                return response
             else:
                 print("Unhandled ICMP response type:", answered_received[1].type)
                 return answered_received[1].summary()
 
-        if type(answered_received[1]) == scapy.layers.inet.TCP:
-            return answered_received.show()
-
-
-
+        print("Unhandled response:\n", answered_received.show())
         return None
 
 
@@ -243,10 +279,12 @@ class DialogNewTraceroutePing:
         self.configuration = dict()
         self.additional_targets = []
 
-        self.add_new_target("1.1.1.1")
-        self.add_new_target("microsoft.com")
-        self.add_new_target("asdf.com")
-        self.add_new_target("shaw.ca")
+        # self.add_new_target("1.1.1.1")
+        # self.add_new_target("microsoft.com")
+        # self.add_new_target("asdf.com")
+        # self.add_new_target("shaw.ca")
+
+        # cat = getaddrinfo("microsoft.com", None, AddressFamily.AF_INET, SocketKind.SOCK_STREAM)
 
         self.window.set_transient_for(transient_for)
         self.window.show_all()
