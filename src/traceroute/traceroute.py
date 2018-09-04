@@ -1,127 +1,165 @@
-from snapins.snapin import Snapin
-
 from scapy.all import *
 import scapy.layers.inet
 
-class ResponseType:
-    TIMEOUT = 0
-    ICMP_TTL_EXCEEDED = 1
-    ICMP_PORT_UNREACH = 2
 
-class RequestType:
-    UDP_SYN = 0 # First traceroute discovery. There will be multiple of these sent out at the same time.
-    TCP_SYN_SEQUENTIAL = 1     # Fallback, initialize connection to tcp/80
-    ICMP_ECHO = 2   # Vanilla Echo
+class ExistingInstance(Exception):
+    """Only one instance of MultiTraceroute is allowed to avoid other instances stealing eachothers replies."""
+
+
+class TargetExists(Exception):
+    """Can only run one traceroute on a single target at a time"""
+
+
+class TracerouteException(Exception):
+    """An unhandled error occured"""
+
+
+class UnhandledNetworkResponse(Exception):
+    """The traceroute engine received a response it was not expecting"""
+
+    def __init__(self, message):
+        self.message = message
 
 
 class MultiTraceroute:
+    INITIALIZED = False
+    UDP_SYN_PORT_START = 33434
+    MAX_WORKERS = 15
+    START_IP_ID = 35454
+    TIMEOUT = 15
+    DefaultConfiguration = {
+        'target': '1.1.1.1',
+        'tr_freq': 500,
+        'traceroute_type': MultiTraceroute._TracerouteFlags.ADAPTIVE,
+        'start_immediately': False,
+        'hop_check_count': 20,
+    }
+
+    # Private record keeping class
+    class _TargetRequest:
+        def __init__(self, address, callback, options):
+            self.address = address
+            self.callback = callback
+            self.options = options
+            self.running = False
+            self.hops = []
+
+    # Options to configure traceroute specifics
+    class _TracerouteFlags:
+        ADAPTIVE = 0xFF
+
+    # Message passing of handled response types
+    class _ResponseType:
+        TIMEOUT = 0
+        ICMP_TTL_EXCEEDED = 1
+        ICMP_PORT_UNREACH = 2
+
+    # Only allow and maintain one instance of this class
+    def _initialize_singleton(self):
+        if MultiTraceroute.INITIALIZED:
+            raise ExistingInstance
+        MultiTraceroute.INITIALIZED = self
+
+        # TODO: Should create a temporary .lock file in a global location
+        # instance they have multiple instances of the client running
+
+    ######################################
+    ## Beginning of the main class code ##
+    ######################################
     def __init__(self, targets):
-        self.requests = {}
-        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=15)
+        self._initialize_singleton()
 
+        self.target_requests = {}
+        self.outstanding_packets = {}
+        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=MultiTraceroute.MAX_WORKERS)
 
-    def register_request(self, request_type, ip_id, target, ttl):
-        if ip_id in self.requests:
-            print("Registered a second request for the same ip.id")
-            return
+    def new_target(self, target, callback, configuration=MultiTraceroute.DefaultConfiguration, start_now=False):
+        # TODO: Verify configuration
 
-        self.requests[ip_id] = (request_type, target, ttl)
+        if target in self.target_requests:
+            raise TargetExists
 
-    def register_response(self, response):
-        request = self.requests[response['request_id']]
+        self.target_requests[target] = MultiTraceroute._TargetRequest(target, callback, configuration)
+        self.target_requests[target].hops = [HopStatus.]
 
-        if response['type'] == ResponseType.TIMEOUT:
-            assert(request[1] == response['target'])
-            assert(request[2] == response['ttl'])
+        if start_now:
+            self.start_traceroute(self.target_requests[target])
 
-        if response['type'] == ResponseType.ICMP_PORT_UNREACH:
-            assert(request[1] == response['target'])
-            assert(request[2] == response['ttl'])
-
-        if response['type'] == ResponseType.ICMP_TTL_EXCEEDED:
-            assert(request[1] == response['target'])
-            assert(request[2] == response['ttl'])
-
-    # cat = getaddrinfo("microsoft.com", None, AddressFamily.AF_INET, SocketKind.SOCK_STREAM)
-
-
-    def start_traceroute(self, addresses):
-        custom_id = random.randint(1000, 20000)
-
-        for ttl in range(1,20):
-            custom_id = custom_id + 1
-            for address in addresses:
-                custom_id = custom_id + 1
-                future = self.executor.submit(SnapInTraceroutePing.worker_tcpsyn, address, ttl, custom_id)
-                future.add_done_callback(self.worker_tcpsyn_complete_callback)
-                self.host_tracker.register_request(RequestType.UDP_SYN, custom_id, target, ttl)
-
-
-    def register_hop(self, worker_data):
-        if worker_data['unanswered']:
-            host = "* -> " + worker_data['target']
+    # Dispatch the traceroute request to the correct initializer
+    def start_traceroute(self, traceroute_request):
+        if traceroute_request.configuration['traceroute_type'] == MultiTraceroute._TracerouteFlags.ADAPTIVE:
+            self.start_adaptive_traceroute(traceroute_request)
         else:
-            host = worker_data['host']
+            raise TracerouteException
 
-        if 'ttl' in worker_data:
-            ttl = worker_data['ttl']
-        else:
-            ttl = 1
+    # Dispatch a single traceroute response to the correct handler
+    def processed_finished_request(self, future):
+        response = future.result()
 
-        if 'rtt' in worker_data:
-            rtt = str(round(worker_data['rtt'] * 1000)) + "ms"
-            worker_data['rtt'] = rtt
-        else:
-            rtt = None
+        traceroute_target = self.target_requests[response['ip_id']]
+        if traceroute_target.configuration['traceroute_type'] == MultiTraceroute._TracerouteFlags.ADAPTIVE:
+            self.process_adaptive_response(traceroute_target, response)
 
-        target = worker_data['target']
+    ############################################
+    # Different implemantations of traceroute ##
+    ############################################
 
-        self.hops[host] = dict()
+    # The adaptive traceroute handler initializer
+    def start_adaptive_traceroute(self, traceroute_request):
+        hop_count = traceroute_request.configuration['hop_check_count']
+        target = traceroute_request.configuration['target']
+        for ttl in range(1, hop_count):
+            MultiTraceroute.CURRENT_IP_ID = MultiTraceroute.CURRENT_IP_ID + 1
 
-        new_node = self.route_model.add_node(host)
-        new_node.attributes.update(worker_data)
-        new_node.posx = ((ttl) * 200) - 100
-        new_node.posy = self.get_target_y(target)
-        new_node.pixbuf = None
-        new_node.presented = False
-        self.visualizer.generate_node_animation(new_node)
+            # Register this new packet to this traceroute request
+            self.outstanding_packets[MultiTraceroute.CURRENT_IP_ID] = traceroute_request
 
-        self.hops[host]['raw'] = worker_data
-        self.hops[host]['ttl'] = ttl
-        self.hops[host]['rtt'] = rtt
-        self.hops[host]['node'] = new_node
-        self.hops[host]['targets'] = [target]
+            # Create the job
+            future = self.executor.submit(MultiTraceroute.worker_udpsyn, target, ttl,
+                                          MultiTraceroute.CURRENT_IP_ID)
+            future.add_done_callback(self.processed_finished_request)
 
-        self.build_links(host, target, ttl, new_node)
+    def process_adaptive_response(self, traceroute_target, response):
+        hop_status = traceroute_target
+        self.adaptive_scan_complete()
 
-    def build_links(self, host, target, ttl, new_node):
-        last_hop = None
-        for key in self.hops:
-            if target in self.hops[key]['targets'] and (self.hops[key]['ttl'] == ttl - 1 or self.hops[key]['ttl'] == ttl + 1):
-                self.hops[host]['previous'] = self.hops[key]
-                self.hops[host]['previous_node'] = self.hops[key]['node']
-                self.route_model.add_link(self.hops[key]['node'], new_node)
+    # Look over all hops sent out in this traceroute. If there is a ICMP Destination
+    # unreachable, or timeouts then try to establish a connection or PING response
+    def adaptive_scan_complete(self):
+        pass
 
-
+    ##########################################################
+    ## Blocking sending/receiving packets and response type ##
+    ##########################################################
+    # Response dict format
+    # target := IpV4 | IpV6 address as a str
+    # type := _ResponseType
+    # raw_sent
+    # raw_recv
+    # ttl
+    # ip_id = the id field in the returned ip header contained in the icmp message
+    # rtt
 
     @staticmethod
-    def worker_tcpsyn(target, cttl, custom_id, include_raw=False):
+    def worker_udpsyn(target, cttl, custom_id, include_raw=False):
         response = dict()
         sent_time = time.time()
-        cork = 33434 + (cttl)
+        cork = MultiTraceroute.UDP_SYN_PORT_START + cttl + custom_id
 
         myfilter = ""
-        ddata = b"\x40\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50\x51\x52\x53\x54\x55\x56\x57\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
-        answered, unanswered_sent = sr(IP(dst=target, ttl=(cttl), id=custom_id) / UDP(dport=cork) / Raw(ddata), verbose=False, timeout=10, filter=myfilter )
+        DATA = b"\x40\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50\x51\x52\x53\x54\x55\x56\x57\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
+        answered, unanswered_sent = sr(IP(dst=target, ttl=(cttl), id=custom_id) / UDP(dport=cork) / Raw(DATA),
+                                       verbose=False, timeout=MultiTraceroute.TIMEOUT, filter=myfilter)
 
         recv_time = time.time()
-        rtt = recv_time - sent_time
+        rtt = recv_time - sent_time  # TODO: This is wrong
 
-
+        # Timeout Exceeded
         if len(unanswered_sent):
             response['target'] = target
             response['ttl'] = unanswered_sent[0].ttl
-            response['type'] = ResponseType.TIMEOUT
+            response['ip_id'] = unanswered_sent[0].id
+            response['type'] = MultiTraceroute._ResponseType.TIMEOUT
             if include_raw:
                 response['raw_sent'] = unanswered_sent
                 response['raw_recv'] = None
@@ -138,26 +176,26 @@ class MultiTraceroute:
             if answered_received[1].type == 11:
                 # ICMP TTL Exceeded
                 response['target'] = target
-                response['ttl'] = answered_received[2].ttl # answered_sent.ttl
+                response['ttl'] = answered_received[2].ttl  # answered_sent.ttl
                 response['host'] = answered_received[0].src
                 response['rtt'] = rtt
                 response['request_id'] = answered_received[2].id
-                response['type'] = ResponseType.ICMP_TTL_EXCEEDED
+                response['type'] = MultiTraceroute._ResponseType.ICMP_TTL_EXCEEDED
                 return response
             elif answered_received[1].type == 3:
                 # ICMP Destination Unreachable/Port Unreachable
-                assert(answered_received[1].code == 3)
+                assert (answered_received[1].code == 3)
                 response['target'] = target
-                response['ttl'] = answered_received[2].ttl # answered_sent.ttl
+                response['ttl'] = answered_received[2].ttl  # answered_sent.ttl
                 response['host'] = answered_received[0].src
                 response['rtt'] = rtt
                 response['request_id'] = answered_received[2].id
-                response['type'] = ResponseType.ICMP_PORT_UNREACH
+                response['type'] = MultiTraceroute._ResponseType.ICMP_PORT_UNREACH
                 return response
-            else:
-                print("Unhandled ICMP response type:", answered_received[1].type)
-                return answered_received[1].summary()
 
-        print("Unhandled response:\n", answered_received.show())
-        return None
+        return UnhandledNetworkResponse(answered_received.show())
+
+
+
+
 
