@@ -4,6 +4,8 @@ import os
 import sys
 
 from snapins.traceroute_ping import SnapInTraceroutePing
+from protocols.traceroute import MultiTraceroute, TracerouteTarget
+
 import concurrent.futures
 
 # def catsoup(future):
@@ -20,16 +22,18 @@ import concurrent.futures
 
 
 def launch_gui():
-    import gi
-    gi.require_version('Gtk', '3.0')
-    from gi.repository import Gtk, GdkPixbuf, GObject, GLib
-    from gui.main_window import MainWindow
+	import gi
+	gi.require_version('Gtk', '3.0')
+	from gi.repository import Gtk, GdkPixbuf, GObject, GLib
+	from gui.main_window import MainWindow
 
-    main_window = MainWindow()
-    Gtk.main()
+	main_window = MainWindow()
+	Gtk.main()
 
 def launch_cmd():
-    from traceroute import MutliTraceroute
-    pass
+	target = TracerouteTarget('1.1.1.1')
+	new_tr = MultiTraceroute(target)
 
-launch_gui()
+
+# launch_gui()
+launch_cmd()

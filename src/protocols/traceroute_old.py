@@ -20,8 +20,17 @@ class UnhandledNetworkResponse(Exception):
     def __init__(self, message):
         self.message = message
 
-
 class MultiTraceroute:
+    # Options to configure traceroute specifics
+    class _TracerouteFlags:
+        ADAPTIVE = 0xFF
+
+    # Message passing of handled response types
+    class _ResponseType:
+        TIMEOUT = 0
+        ICMP_TTL_EXCEEDED = 1
+        ICMP_PORT_UNREACH = 2
+
     INITIALIZED = False
     UDP_SYN_PORT_START = 33434
     MAX_WORKERS = 15
@@ -30,9 +39,9 @@ class MultiTraceroute:
     DefaultConfiguration = {
         'target': '1.1.1.1',
         'tr_freq': 500,
-        'traceroute_type': MultiTraceroute._TracerouteFlags.ADAPTIVE,
+        'traceroute_type': _TracerouteFlags.ADAPTIVE,
         'start_immediately': False,
-        'hop_check_count': 20,
+        'max_hop_search': 20,
     }
 
     # Private record keeping class
@@ -43,16 +52,6 @@ class MultiTraceroute:
             self.options = options
             self.running = False
             self.hops = []
-
-    # Options to configure traceroute specifics
-    class _TracerouteFlags:
-        ADAPTIVE = 0xFF
-
-    # Message passing of handled response types
-    class _ResponseType:
-        TIMEOUT = 0
-        ICMP_TTL_EXCEEDED = 1
-        ICMP_PORT_UNREACH = 2
 
     # Only allow and maintain one instance of this class
     def _initialize_singleton(self):
@@ -73,14 +72,14 @@ class MultiTraceroute:
         self.outstanding_packets = {}
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=MultiTraceroute.MAX_WORKERS)
 
-    def new_target(self, target, callback, configuration=MultiTraceroute.DefaultConfiguration, start_now=False):
+    def new_target(self, target, callback, configuration=DefaultConfiguration, start_now=False):
         # TODO: Verify configuration
 
         if target in self.target_requests:
             raise TargetExists
 
         self.target_requests[target] = MultiTraceroute._TargetRequest(target, callback, configuration)
-        self.target_requests[target].hops = [HopStatus.]
+        # self.target_requests[target].hops = [HopStatus.]
 
         if start_now:
             self.start_traceroute(self.target_requests[target])
@@ -106,7 +105,7 @@ class MultiTraceroute:
 
     # The adaptive traceroute handler initializer
     def start_adaptive_traceroute(self, traceroute_request):
-        hop_count = traceroute_request.configuration['hop_check_count']
+        hop_count = traceroute_request.configuration['max_hop_search']
         target = traceroute_request.configuration['target']
         for ttl in range(1, hop_count):
             MultiTraceroute.CURRENT_IP_ID = MultiTraceroute.CURRENT_IP_ID + 1
