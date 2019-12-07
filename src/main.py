@@ -1,10 +1,6 @@
 #!/usr/bin/python3
 
-
 import os
-
-
-
 import sys
 
 from snapins.traceroute_ping import SnapInTraceroutePing
@@ -33,3 +29,6 @@ def launch_gui():
     Gtk.main()
 
 def launch_cmd():
+    pass
+
+launch_gui()
