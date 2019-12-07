@@ -1,5 +1,23 @@
 #!/usr/bin/python3
 
+import os
+import sys
+
+from snapins.traceroute_ping import SnapInTraceroutePing
+import concurrent.futures
+
+# def catsoup(future):
+#     worker_data = future.result()
+#     if worker_data:
+#         print(worker_data)
+#         sys.stdout.flush()
+#
+# executor =  concurrent.futures.ThreadPoolExecutor(max_workers=10)
+# for ttl in range(1,20):
+#     future = executor.submit(SnapInTraceroutePing.worker_tcpsyn, "1.1.1.1", ttl)
+#     future.add_done_callback(catsoup)
+
+
 
 def launch_gui():
     import gi
@@ -12,5 +30,6 @@ def launch_gui():
 
 def launch_cmd():
     from traceroute import MutliTraceroute
+    pass
 
 launch_gui()
