@@ -9,6 +9,8 @@ import cairo
 
 # from net.traceroute import TraceRouteNode, TraceRoute
 from snapins.traceroute_ping import SnapInTraceroutePing
+from snapins.pmtud import SnapInPathMTUDiscovery
+
 from get_root_path import get_root_path
 
 class MainWindow:
@@ -48,7 +50,7 @@ class MainWindow:
         #
         # self.update_route_model_from_traceroute()
         # self.route_model.new_node_position = [75, 250]
-        self.new_traceroute_ping(None)
+        # self.new_traceroute_ping(None)
 
     def connect_builder_objects(self):
         builder = Gtk.Builder()
@@ -56,18 +58,24 @@ class MainWindow:
 
         self.window = builder.get_object("main_window")
         self.notebook_tasks = builder.get_object("notebook_tasks")
-        self.button_welcome_new_traceroute_ping = builder.get_object("button_welcome_new_traceroute_ping")
-        self.menu_new_traceroute_ping = builder.get_object("menu_new_traceroute_ping")
 
+
+        self.button_welcome_new_traceroute_ping = builder.get_object("button_welcome_new_traceroute_ping")
         self.button_welcome_new_traceroute_ping.connect("clicked", self.new_traceroute_ping)
 
+        self.menu_new_traceroute_ping = builder.get_object("menu_new_traceroute_ping")
         self.menu_new_traceroute_ping.connect("activate", self.new_traceroute_ping)
+
+        self.button_new_pmtud = builder.get_object("button_new_pmtud")
+        self.button_new_pmtud.connect("clicked", self.new_pmtud)
+
+
         self.window.connect("delete-event", Gtk.main_quit)
 
         self.window.show_all()
 
-    def add_new_traceroute_ping_children(self, configuration):
-        ntrp = SnapInTraceroutePing(configuration)
+    def add_new_traceroute_ping_children(self, config):
+        ntrp = SnapInTraceroutePing(config)
         self.traceroute_ping_interfaces.append(ntrp)
         notebook_label = Gtk.Label("Traceroute Ping")
         new_page = self.notebook_tasks.append_page(ntrp.main_box, notebook_label)
@@ -78,6 +86,21 @@ class MainWindow:
 
         if config is not None:
             self.add_new_traceroute_ping_children(config)
+
+    #####################################################################################
+
+    def add_new_pmtud_children(self, config):
+        npmtud = SnapInPathMTUDiscovery(config)
+        notebook_label = Gtk.Label("Traceroute Ping")
+        new_page = self.notebook_tasks.append_page(None, notebook_label)
+        self.notebook_tasks.set_current_page(new_page)
+
+    def new_pmtud(self, event):
+        config = SnapInPathMTUDiscovery.new_dialog(self.window)
+
+        if config is not None:
+            self.add_new_pmtud_children(config)
+
 
 
 

@@ -35,5 +35,5 @@ def launch_cmd():
 	new_tr = MultiTraceroute(target)
 
 
-# launch_gui()
-launch_cmd()
+launch_gui()
+# launch_cmd()
